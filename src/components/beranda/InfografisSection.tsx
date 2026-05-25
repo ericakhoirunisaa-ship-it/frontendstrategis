@@ -71,17 +71,17 @@ export default function InfografisSection() {
 
   return (
     <>
-      <section className="bg-white py-16 border-t border-slate-100">
+      <section className="bg-white dark:bg-[#0F1825] py-16 border-t border-slate-100 dark:border-slate-700/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Header */}
           <div className="mb-10">
             <span className="section-tag mb-3">Infografis</span>
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340]">
+              <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white">
                 Infografis BPS Toli-Toli
               </h2>
-              <p className="text-slate-400 text-sm">Klik gambar untuk memperbesar.</p>
+              <p className="text-slate-400 dark:text-slate-500 text-sm">Klik gambar untuk memperbesar.</p>
             </div>
           </div>
 
@@ -91,7 +91,7 @@ export default function InfografisSection() {
               <button
                 key={item.id}
                 onClick={() => setLightbox(i)}
-                className="group relative aspect-[3/4] rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-left"
+                className="group relative aspect-[3/4] rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-left"
               >
                 {/* Gambar */}
                 <img

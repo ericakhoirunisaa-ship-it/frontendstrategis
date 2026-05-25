@@ -46,17 +46,17 @@ const cards = [
 
 export default function KilasDataSection() {
   return (
-    <section className="bg-[#F8FAFC] py-16 border-t border-slate-100">
+    <section className="bg-[#F8FAFC] dark:bg-[#0B1120] py-16 border-t border-slate-100 dark:border-slate-700/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
         <div className="mb-10">
           <span className="section-tag mb-3">Kilas Data Strategis</span>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] leading-tight">
+            <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white leading-tight">
               Temukan Data yang Anda Butuhkan
             </h2>
-            <p className="text-slate-500 text-sm max-w-xs leading-relaxed">
+            <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs leading-relaxed">
               Akses berbagai data statistik resmi Kabupaten Toli-Toli melalui layanan yang tersedia.
             </p>
           </div>

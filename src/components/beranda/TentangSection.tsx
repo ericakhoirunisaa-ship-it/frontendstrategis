@@ -16,7 +16,7 @@ const angka = [
 
 export default function TentangSection() {
   return (
-    <section className="bg-white py-16 border-t border-slate-100">
+    <section className="bg-white dark:bg-[#0F1825] py-16 border-t border-slate-100 dark:border-slate-700/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
 
@@ -26,7 +26,7 @@ export default function TentangSection() {
               {angka.map((item) => (
                 <div
                   key={item.satuan}
-                  className="rounded-2xl border border-slate-100 bg-[#F8FAFC] p-6 text-center"
+                  className="rounded-2xl border border-slate-100 dark:border-slate-700/50 bg-[#F8FAFC] dark:bg-[#162133] p-6 text-center"
                 >
                   <p
                     className="text-4xl font-extrabold leading-none mb-1"
@@ -34,18 +34,18 @@ export default function TentangSection() {
                   >
                     {item.nilai}
                   </p>
-                  <p className="text-slate-500 text-sm font-medium">{item.satuan}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">{item.satuan}</p>
                 </div>
               ))}
             </div>
 
             {/* Official badge */}
-            <div className="mt-5 flex items-center gap-3 p-4 rounded-xl bg-[#EBF4FF] border border-[#BFDBFE]">
+            <div className="mt-5 flex items-center gap-3 p-4 rounded-xl bg-[#EBF4FF] dark:bg-blue-900/20 border border-[#BFDBFE] dark:border-blue-800/30">
               <div className="flex h-5 w-8 overflow-hidden rounded shadow-sm shrink-0">
                 <div className="w-1/2 bg-red-500" />
                 <div className="w-1/2 bg-white" />
               </div>
-              <p className="text-sm text-[#1D6FCA] font-semibold">
+              <p className="text-sm text-[#1D6FCA] dark:text-blue-400 font-semibold">
                 Portal Resmi BPS Kabupaten Toli-Toli
               </p>
               <a
@@ -62,10 +62,10 @@ export default function TentangSection() {
           {/* Right: Text */}
           <div className="order-1 lg:order-2">
             <span className="section-tag mb-4">Tentang Portal</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] mb-4 leading-tight">
+            <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white mb-4 leading-tight">
               Website Data Strategis<br />Kabupaten Toli-Toli
             </h2>
-            <p className="text-slate-500 text-sm leading-relaxed mb-6">
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
               Portal ini adalah platform resmi BPS Toli-Toli yang menyajikan data dan
               indikator statistik strategis daerah secara digital, transparan, dan mudah
               diakses oleh masyarakat, pemerintah daerah, maupun peneliti.
@@ -78,7 +78,7 @@ export default function TentangSection() {
                     style={{ color: "#1D6FCA" }}
                     strokeWidth={2.5}
                   />
-                  <span className="text-slate-600 text-sm leading-relaxed">{f}</span>
+                  <span className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{f}</span>
                 </li>
               ))}
             </ul>

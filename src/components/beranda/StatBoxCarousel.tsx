@@ -55,7 +55,7 @@ export default function StatBoxCarousel() {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-36 rounded-2xl animate-pulse bg-slate-200" />
+          <div key={i} className="h-36 rounded-2xl animate-pulse bg-slate-200 dark:bg-slate-700" />
         ))}
       </div>
     );

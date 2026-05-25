@@ -12,7 +12,7 @@ import { ArrowRight, Shield, Database, BarChart3 } from "lucide-react";
 
 export default function BerandaPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
+    <div className="flex flex-col min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120]">
       <Navbar />
 
       {/* ── HERO ─────────────────────────────────────────────── */}
@@ -98,12 +98,12 @@ export default function BerandaPage() {
       </section>
 
       {/* ── STATISTIK UTAMA ───────────────────────────────────── */}
-      <section className="bg-white border-b border-slate-100 py-12">
+      <section className="bg-white dark:bg-[#0F1825] border-b border-slate-100 dark:border-slate-700/50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-7">
             <div>
               <span className="section-tag mb-2">Statistik Utama</span>
-              <h2 className="text-xl md:text-2xl font-bold text-[#0C2340]">
+              <h2 className="text-xl md:text-2xl font-bold text-[#0C2340] dark:text-white">
                 Ringkasan Indikator Kab. Toli-Toli
               </h2>
             </div>

@@ -156,3 +156,11 @@
 .btn-outline:hover {
   background: #DBEAFE;
 }
+.dark .btn-outline {
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.3);
+  background: rgba(29, 111, 202, 0.15);
+}
+.dark .btn-outline:hover {
+  background: rgba(29, 111, 202, 0.25);
+}

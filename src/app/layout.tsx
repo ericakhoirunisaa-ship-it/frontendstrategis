@@ -19,6 +19,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" className={plusJakarta.variable} suppressHydrationWarning>
+      <head>
+        {/* Prevent flash of light mode for users who saved dark theme */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-[#F5F8FC] dark:bg-[#0B1120] antialiased" style={{ fontFamily: "var(--font-plus-jakarta), sans-serif" }}>
         <ThemeProvider>
           {children}

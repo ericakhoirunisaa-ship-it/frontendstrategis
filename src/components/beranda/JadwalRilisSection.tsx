@@ -38,23 +38,23 @@ function MiniCalendar({ jadwals }: { jadwals: Jadwal[] }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 shrink-0 w-full lg:w-64">
+    <div className="bg-white dark:bg-[#162133] rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm p-5 shrink-0 w-full lg:w-64">
       {/* Header bulan */}
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={() => setCurrent((c) => subMonths(c, 1))}
-          className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 transition-colors"
+          className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
         >
-          <ChevronLeft className="w-4 h-4 text-slate-500" />
+          <ChevronLeft className="w-4 h-4 text-slate-500 dark:text-slate-400" />
         </button>
-        <p className="text-sm font-bold text-[#0C2340] capitalize">
+        <p className="text-sm font-bold text-[#0C2340] dark:text-white capitalize">
           {format(current, "MMMM yyyy", { locale: id })}
         </p>
         <button
           onClick={() => setCurrent((c) => addMonths(c, 1))}
-          className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 transition-colors"
+          className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
         >
-          <ChevronRight className="w-4 h-4 text-slate-500" />
+          <ChevronRight className="w-4 h-4 text-slate-500 dark:text-slate-400" />
         </button>
       </div>
 
@@ -86,10 +86,10 @@ function MiniCalendar({ jadwals }: { jadwals: Jadwal[] }) {
               <div
                 className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-semibold transition-colors ${
                   today
-                    ? "bg-[#0C2340] text-white"
+                    ? "bg-[#0C2340] dark:bg-blue-600 text-white"
                     : kat
                     ? "text-white"
-                    : "text-slate-600 hover:bg-slate-100"
+                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
                 }`}
                 style={kat && !today ? { backgroundColor: kat.color } : {}}
                 title={kat ? jadwals.find((j) => isSameDay(new Date(j.tanggal), day))?.judul : undefined}
@@ -102,7 +102,7 @@ function MiniCalendar({ jadwals }: { jadwals: Jadwal[] }) {
       </div>
 
       {/* Legend */}
-      <div className="mt-4 border-t border-slate-100 pt-3 space-y-1.5">
+      <div className="mt-4 border-t border-slate-100 dark:border-slate-700/50 pt-3 space-y-1.5">
         {Object.entries(KATEGORI).map(([key, val]) => (
           <div key={key} className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: val.color }} />
@@ -130,14 +130,14 @@ export default function JadwalRilisSection() {
   const displayed = items.slice(0, 5);
 
   return (
-    <section className="bg-[#F8FAFC] py-16 border-t border-slate-100">
+    <section className="bg-[#F8FAFC] dark:bg-[#0B1120] py-16 border-t border-slate-100 dark:border-slate-700/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
         <div className="flex items-end justify-between mb-8">
           <div>
             <span className="section-tag mb-3">Jadwal Rilis</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340]">
+            <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white">
               Publikasi BPS Toli-Toli
             </h2>
           </div>
@@ -156,7 +156,7 @@ export default function JadwalRilisSection() {
           <div className="flex-1 space-y-2.5">
             {displayed.length === 0
               ? [...Array(4)].map((_, i) => (
-                  <div key={i} className="h-16 rounded-xl bg-slate-100 animate-pulse" />
+                  <div key={i} className="h-16 rounded-xl bg-slate-100 dark:bg-slate-700 animate-pulse" />
                 ))
               : displayed.map((item) => {
                   const kat = KATEGORI[item.kategori] || KATEGORI.BRS;
@@ -165,11 +165,11 @@ export default function JadwalRilisSection() {
                   return (
                     <div
                       key={item.id}
-                      className="bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow px-4 py-3.5 flex items-center gap-4"
+                      className="bg-white dark:bg-[#162133] rounded-xl border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-shadow px-4 py-3.5 flex items-center gap-4"
                     >
                       {/* Tanggal */}
                       <div className="shrink-0 w-12 text-center">
-                        <p className="text-xl font-extrabold text-[#0C2340] leading-none">
+                        <p className="text-xl font-extrabold text-[#0C2340] dark:text-white leading-none">
                           {format(new Date(item.tanggal), "d")}
                         </p>
                         <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
@@ -177,11 +177,11 @@ export default function JadwalRilisSection() {
                         </p>
                       </div>
 
-                      <div className="w-px h-10 bg-slate-100 shrink-0" />
+                      <div className="w-px h-10 bg-slate-100 dark:bg-slate-700 shrink-0" />
 
                       {/* Ikon */}
                       <div
-                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 dark:!bg-white/10"
                         style={{ backgroundColor: kat.bg }}
                       >
                         <Icon className="w-4 h-4" style={{ color: kat.color }} />
@@ -189,17 +189,19 @@ export default function JadwalRilisSection() {
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[#0C2340] truncate">{item.judul}</p>
+                        <p className="text-sm font-semibold text-[#0C2340] dark:text-white truncate">{item.judul}</p>
                         <div className="flex items-center gap-2 mt-1">
                           <span
-                            className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                            className="text-[10px] font-bold px-2 py-0.5 rounded-full dark:!bg-white/10"
                             style={{ backgroundColor: kat.bg, color: kat.color }}
                           >
                             {item.kategori}
                           </span>
                           <span
                             className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                              released ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+                              released
+                                ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+                                : "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
                             }`}
                           >
                             {released ? "✓ Sudah Rilis" : "⏱ Akan Rilis"}
