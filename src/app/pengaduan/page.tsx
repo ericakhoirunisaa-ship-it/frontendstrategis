@@ -64,6 +64,7 @@ export default function PengaduanPage() {
     noIdentitas: "",
     alamat: "",
     noTelpon: "",
+    email: "",
     isiPengaduan: "",
   });
   const [fotoIdentitas, setFotoIdentitas] = useState<File | null>(null);
@@ -102,10 +103,20 @@ export default function PengaduanPage() {
               <CheckCircle className="w-8 h-8 text-green-500" />
             </div>
             <h2 className="text-xl font-bold text-[#0C2340] mb-2">Pengaduan Terkirim!</h2>
-            <p className="text-slate-500 text-sm leading-relaxed mb-6">
+            <p className="text-slate-500 text-sm leading-relaxed mb-4">
               Terima kasih telah menyampaikan pengaduan Anda. Petugas BPS Kabupaten Toli-Toli
               akan menindaklanjuti laporan ini secepatnya.
             </p>
+            <div className="bg-slate-50 rounded-xl px-4 py-3 text-left mb-6 space-y-1.5">
+              <p className="text-xs text-slate-500">
+                📱 Konfirmasi telah dikirim ke nomor WhatsApp Anda.
+              </p>
+              {form.email && (
+                <p className="text-xs text-slate-500">
+                  📧 Konfirmasi juga dikirim ke <strong>{form.email}</strong>.
+                </p>
+              )}
+            </div>
             <a
               href="/"
               className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-[#1E3A5F] text-white text-sm font-semibold hover:bg-[#162d4a] transition-colors"
@@ -209,6 +220,22 @@ export default function PengaduanPage() {
                 placeholder="Contoh: 085183287206"
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               />
+              <p className="text-[11px] text-slate-400 mt-1">Konfirmasi pengaduan akan dikirim ke nomor WhatsApp ini.</p>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-[#1A1A2E] mb-1">
+                Alamat Email
+              </label>
+              <input
+                value={form.email}
+                onChange={(e) => set("email", e.target.value)}
+                type="email"
+                placeholder="Contoh: nama@email.com"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+              />
+              <p className="text-[11px] text-slate-400 mt-1">Opsional. Konfirmasi pengaduan akan dikirim ke email ini jika diisi.</p>
             </div>
 
             {/* Isi Pengaduan */}
