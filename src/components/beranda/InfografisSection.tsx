@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { infografisApi } from "@/lib/api";
-import { ImageIcon, X, ChevronLeft, ChevronRight, Download, FileText } from "lucide-react";
+import Link from "next/link";
+import { ImageIcon, X, ChevronLeft, ChevronRight, Download, FileText, ArrowRight } from "lucide-react";
 
 async function downloadImage(url: string, judul: string) {
   const res = await fetch(url);
@@ -81,13 +82,21 @@ export default function InfografisSection() {
               <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white">
                 Infografis BPS Toli-Toli
               </h2>
-              <p className="text-slate-400 dark:text-slate-500 text-sm">Klik gambar untuk memperbesar.</p>
+              <div className="flex items-center gap-4">
+                <p className="text-slate-400 dark:text-slate-500 text-sm">Klik gambar untuk memperbesar.</p>
+                <Link
+                  href="/infografis"
+                  className="hidden sm:flex items-center gap-1.5 text-[#1D6FCA] text-sm font-semibold hover:underline shrink-0"
+                >
+                  Lihat Semua <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
             </div>
           </div>
 
           {/* Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {items.map((item, i) => (
+            {items.slice(0, 8).map((item, i) => (
               <button
                 key={item.id}
                 onClick={() => setLightbox(i)}
@@ -110,6 +119,13 @@ export default function InfografisSection() {
                 </div>
               </button>
             ))}
+          </div>
+
+          {/* Tombol mobile */}
+          <div className="sm:hidden mt-6 text-center">
+            <Link href="/infografis" className="btn-outline text-sm inline-flex items-center gap-1.5">
+              Lihat Semua <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
