@@ -8,6 +8,8 @@ import { useTheme } from "@/components/ThemeProvider";
 const navLinks = [
   { href: "/", label: "Beranda" },
   { href: "/data-strategis", label: "Data Strategis" },
+  { href: "/infografis", label: "Infografis" },
+  { href: "/jadwal-rilis", label: "Jadwal Rilis" },
   { href: "/peta-tematik", label: "Peta Tematik" },
   { href: "/layanan-konsultasi", label: "Layanan" },
 ];

@@ -71,3 +71,18 @@ export const pengaduanApi = {
   update: (id: number, data: { status?: string; catatan?: string }) => api.put(`/pengaduan/${id}`, data),
   delete: (id: number) => api.delete(`/pengaduan/${id}`),
 };
+
+export const petaTematikApi = {
+  getAll: () => api.get('/peta-tematik'),
+  getOne: (id: number) => api.get(`/peta-tematik/${id}`),
+  create: (data: { judul: string; deskripsi?: string; imageUrl?: string; geoJsonUrl?: string; indikatorId?: number }) =>
+    api.post('/peta-tematik', data),
+  update: (id: number, data: { judul?: string; deskripsi?: string; imageUrl?: string; geoJsonUrl?: string; indikatorId?: number }) =>
+    api.put(`/peta-tematik/${id}`, data),
+  delete: (id: number) => api.delete(`/peta-tematik/${id}`),
+};
+
+export const statsApi = {
+  get: () => api.get('/stats'),
+  recordVisit: () => api.post('/stats/kunjungan'),
+};
