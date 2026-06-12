@@ -32,6 +32,9 @@ interface Indikator {
   metodologi?: string;
   sumberData?: string;
   interpretasi?: string;
+  filterTahun?: boolean;
+  filterDaerah?: boolean;
+  filterKolom?: boolean;
 }
 
 interface DataPoint {
@@ -370,6 +373,9 @@ export default function DataStrategisPage() {
   };
 
   const activeCat = CATEGORY_DEFS.find((c) => c.kategori === selectedInd?.kategori);
+  const showFilterTahun  = selectedInd?.filterTahun  ?? true;
+  const showFilterDaerah = selectedInd?.filterDaerah ?? true;
+  const showFilterKolom  = selectedInd?.filterKolom  ?? true;
 
   // Filter options derived from raw data (so dropdowns always show all available options)
   const tahunOptions  = ["all", ...[...new Set(data.map((d) => String(d.tahun)))].sort()];
@@ -510,8 +516,9 @@ export default function DataStrategisPage() {
                   <div className="flex flex-wrap gap-3 mb-4">
                     <div className="flex items-center gap-2 flex-wrap">
                       <Filter className="w-4 h-4 text-gray-400 shrink-0" />
+
                       {/* Tahun */}
-                      {dataHasMultiYears && (
+                      {showFilterTahun && dataHasMultiYears && (
                         <select
                           value={filterTahun}
                           onChange={(e) => setFilterTahun(e.target.value)}
@@ -522,20 +529,28 @@ export default function DataStrategisPage() {
                           ))}
                         </select>
                       )}
+
                       {/* Daerah */}
-                      <select
-                        value={filterDaerah}
-                        onChange={(e) => setFilterDaerah(e.target.value)}
-                        className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                      >
-                        {daerahOptions.map((d) => (
-                          <option key={d} value={d}>
-                            {d === "all" ? (isSingleYear ? "Semua Kelompok" : "Semua Daerah") : d}
-                          </option>
-                        ))}
-                      </select>
+                      {showFilterDaerah ? (
+                        <select
+                          value={filterDaerah}
+                          onChange={(e) => setFilterDaerah(e.target.value)}
+                          className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        >
+                          {daerahOptions.map((d) => (
+                            <option key={d} value={d}>
+                              {d === "all" ? (isSingleYear ? "Semua Kelompok" : "Semua Daerah") : d}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-gray-50 text-gray-500">
+                          {isSingleYear ? "Semua Kelompok" : "Semua Daerah"}
+                        </span>
+                      )}
+
                       {/* Kolom */}
-                      {kolomOptions.length > 1 && (
+                      {showFilterKolom && kolomOptions.length > 1 && (
                         <select
                           value={filterKolom}
                           onChange={(e) => setFilterKolom(e.target.value)}
