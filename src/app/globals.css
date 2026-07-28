@@ -164,3 +164,51 @@
 .dark .btn-outline:hover {
   background: rgba(29, 111, 202, 0.25);
 }
+
+/* ── Mode Kontras Tinggi ─────────────────────────────────────────── */
+.high-contrast body {
+  background: #000 !important;
+  color: #fff !important;
+}
+.high-contrast * {
+  border-color: #fff !important;
+}
+.high-contrast nav,
+.high-contrast header,
+.high-contrast footer {
+  background: #000 !important;
+  border-color: #fff !important;
+}
+.high-contrast a,
+.high-contrast button {
+  color: #FFD700 !important;
+}
+.high-contrast p,
+.high-contrast span,
+.high-contrast li,
+.high-contrast td,
+.high-contrast th,
+.high-contrast h1,
+.high-contrast h2,
+.high-contrast h3,
+.high-contrast h4 {
+  color: #fff !important;
+}
+.high-contrast section,
+.high-contrast div[class*="bg-"] {
+  background: #000 !important;
+}
+.high-contrast input,
+.high-contrast select,
+.high-contrast textarea {
+  background: #111 !important;
+  color: #fff !important;
+  border: 2px solid #FFD700 !important;
+}
+.high-contrast img {
+  filter: contrast(1.2) brightness(0.9);
+}
+.high-contrast .btn-primary {
+  background: #FFD700 !important;
+  color: #000 !important;
+}

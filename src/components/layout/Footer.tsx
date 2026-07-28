@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Phone, MessageCircle, Mail, Clock } from "lucide-react";
 
 export default function Footer() {
@@ -13,23 +14,20 @@ export default function Footer() {
           {/* Branding */}
           <div className="md:col-span-4">
             <div className="flex items-center gap-3 mb-4">
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow"
-                style={{ background: "linear-gradient(135deg, #1D6FCA 0%, #0C4A9E 100%)" }}
-              >
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-                  <rect x="3" y="12" width="4" height="9" rx="1" />
-                  <rect x="10" y="7" width="4" height="14" rx="1" />
-                  <rect x="17" y="3" width="4" height="18" rx="1" />
-                </svg>
-              </div>
+              <Image
+                src="/logo-sitara.png"
+                alt="SITARA"
+                width={48}
+                height={48}
+                className="shrink-0"
+              />
               <div>
-                <p className="text-white font-bold text-[15px] leading-tight">Portal Data Strategis</p>
+                <p className="text-white font-bold text-[15px] leading-tight">SITARA</p>
                 <p className="text-slate-400 text-xs leading-tight mt-0.5">BPS Kabupaten Toli-Toli</p>
               </div>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed mb-4">
-              Portal resmi data statistik dan indikator strategis Kabupaten Toli-Toli,
+              Sistem Informasi Indikator Strategis (SITARA) resmi BPS Kabupaten Toli-Toli,
               Provinsi Sulawesi Tengah. Data bersumber dari Badan Pusat Statistik.
             </p>
           </div>
@@ -41,7 +39,7 @@ export default function Footer() {
               {[
                 { href: "/", label: "Beranda" },
                 { href: "/data-strategis", label: "Data Strategis" },
-                { href: "/peta-tematik", label: "Peta Tematik" },
+                { href: "/infografis", label: "Infografis" },
                 { href: "/layanan-konsultasi", label: "Layanan Konsultasi" },
               ].map((link) => (
                 <li key={link.href}>

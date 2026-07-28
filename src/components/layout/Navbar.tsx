@@ -1,14 +1,16 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
+import AccessibilityWidget from "@/components/AccessibilityWidget";
 
 const navLinks = [
   { href: "/", label: "Beranda" },
   { href: "/data-strategis", label: "Data Strategis" },
-  { href: "/peta-tematik", label: "Peta Tematik" },
+  { href: "/infografis", label: "Infografis" },
   { href: "/layanan-konsultasi", label: "Layanan" },
 ];
 
@@ -24,19 +26,16 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-[60px]">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
-                style={{ background: "linear-gradient(135deg, #1D6FCA 0%, #0C4A9E 100%)" }}
-              >
-                <svg viewBox="0 0 24 24" className="w-5 h-5 text-white fill-white">
-                  <rect x="3" y="12" width="4" height="9" rx="1" />
-                  <rect x="10" y="7" width="4" height="14" rx="1" />
-                  <rect x="17" y="3" width="4" height="18" rx="1" />
-                </svg>
-              </div>
+            <Link href="/" className="flex items-center gap-2 group">
+              <Image
+                src="/logo-sitara.png"
+                alt="SITARA"
+                width={44}
+                height={44}
+                className="shrink-0"
+              />
               <div className="leading-tight">
-                <p className="text-[#0C2340] dark:text-white font-bold text-[15px]">Data Strategis</p>
+                <p className="text-[#0C2340] dark:text-white font-bold text-[15px]">SITARA</p>
                 <p className="text-slate-400 dark:text-slate-500 text-[11px] font-medium">BPS Kab. Toli-Toli</p>
               </div>
             </Link>
@@ -85,6 +84,8 @@ export default function Navbar() {
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
+              {/* Accessibility widget */}
+              <AccessibilityWidget />
               <Link
                 href="/layanan-konsultasi"
                 className="btn-primary text-xs px-4 py-2"
@@ -93,7 +94,7 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Mobile right: toggle + hamburger */}
+            {/* Mobile right: toggle + accessibility + hamburger */}
             <div className="md:hidden flex items-center gap-1">
               <button
                 onClick={toggle}
@@ -102,6 +103,7 @@ export default function Navbar() {
               >
                 {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
+              <AccessibilityWidget />
               <button
                 onClick={() => setOpen(!open)}
                 className="p-2 rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"

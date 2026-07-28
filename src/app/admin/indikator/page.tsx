@@ -24,12 +24,12 @@ interface Indikator {
 }
 
 const KATEGORI_OPTIONS = [
-  "Ekonomi",
-  "Pembangunan Manusia",
-  "Gender",
   "Kependudukan",
+  "Ekonomi",
   "Kemiskinan",
-  "Pertanian",
+  "Ketenagakerjaan",
+  "Indeks Pembangunan Manusia (IPM)",
+  "Pendidikan",
   "Lainnya",
 ];
 

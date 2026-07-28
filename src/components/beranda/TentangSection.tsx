@@ -46,7 +46,7 @@ export default function TentangSection() {
                 <div className="w-1/2 bg-white" />
               </div>
               <p className="text-sm text-[#1D6FCA] dark:text-blue-400 font-semibold">
-                Portal Resmi BPS Kabupaten Toli-Toli
+                SITARA — Resmi BPS Kabupaten Toli-Toli
               </p>
               <a
                 href="https://tolitolikab.bps.go.id"
@@ -61,12 +61,12 @@ export default function TentangSection() {
 
           {/* Right: Text */}
           <div className="order-1 lg:order-2">
-            <span className="section-tag mb-4">Tentang Portal</span>
+            <span className="section-tag mb-4">Sistem Informasi Indikator Strategis (SITARA)</span>
             <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white mb-4 leading-tight">
-              Website Data Strategis<br />Kabupaten Toli-Toli
+              SITARA<br />Kabupaten Toli-Toli
             </h2>
             <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
-              Portal ini adalah platform resmi BPS Toli-Toli yang menyajikan data dan
+              SITARA adalah platform resmi BPS Toli-Toli yang menyajikan data dan
               indikator statistik strategis daerah secara digital, transparan, dan mudah
               diakses oleh masyarakat, pemerintah daerah, maupun peneliti.
             </p>

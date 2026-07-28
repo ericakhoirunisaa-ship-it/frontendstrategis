@@ -34,7 +34,7 @@ export default function BerandaPage() {
               </div>
 
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-[1.15] mb-4">
-                Portal Data Strategis<br />
+                Sistem Informasi Indikator Strategis<br />
                 <span className="text-[#38BDF8]">Kabupaten Toli-Toli</span>
               </h1>
               <p className="text-white/50 text-base leading-relaxed mb-8">

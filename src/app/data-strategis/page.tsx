@@ -12,12 +12,12 @@ import {
 
 // Fixed 6 categories — labels/colors never change; sub-indicators come from DB
 const CATEGORY_DEFS = [
-  { key: "A", label: "Ekonomi",            color: "#1D6FCA", kategori: "Ekonomi" },
-  { key: "B", label: "Pembangunan Manusia", color: "#059669", kategori: "Pembangunan Manusia" },
-  { key: "C", label: "Gender",             color: "#D97706", kategori: "Gender" },
-  { key: "D", label: "Kependudukan",       color: "#7C3AED", kategori: "Kependudukan" },
-  { key: "E", label: "Kemiskinan",         color: "#DC2626", kategori: "Kemiskinan" },
-  { key: "F", label: "Pertanian",          color: "#16A34A", kategori: "Pertanian" },
+  { key: "A", label: "Kependudukan",                    color: "#1D6FCA", kategori: "Kependudukan" },
+  { key: "B", label: "Ekonomi",                         color: "#059669", kategori: "Ekonomi" },
+  { key: "C", label: "Kemiskinan",                      color: "#D97706", kategori: "Kemiskinan" },
+  { key: "D", label: "Ketenagakerjaan",                 color: "#7C3AED", kategori: "Ketenagakerjaan" },
+  { key: "E", label: "Indeks Pembangunan Manusia (IPM)", color: "#DC2626", kategori: "Indeks Pembangunan Manusia (IPM)" },
+  { key: "F", label: "Pendidikan",                      color: "#16A34A", kategori: "Pendidikan" },
 ] as const;
 
 interface Indikator {

@@ -11,9 +11,9 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Data Strategis Kabupaten Toli-Toli | BPS Toli-Toli",
-  description: "Portal Data Statistik dan Indikator Strategis Kabupaten Toli-Toli, Sulawesi Tengah",
-  keywords: ["BPS", "Toli-Toli", "data strategis", "statistik", "kabupaten"],
+  title: "SITARA — Sistem Informasi Indikator Strategis Kabupaten Toli-Toli",
+  description: "Sistem Informasi Indikator Strategis (SITARA) BPS Kabupaten Toli-Toli, Sulawesi Tengah",
+  keywords: ["BPS", "Toli-Toli", "SITARA", "indikator strategis", "statistik", "kabupaten"],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -24,6 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html: `try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var f=localStorage.getItem('a11y-font');if(f==='sm')document.documentElement.style.fontSize='14px';else if(f==='lg')document.documentElement.style.fontSize='19px';if(localStorage.getItem('a11y-contrast')==='1')document.documentElement.classList.add('high-contrast')}catch(e){}`,
           }}
         />
       </head>
