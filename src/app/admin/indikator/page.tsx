@@ -193,6 +193,7 @@ export default function AdminIndikatorPage() {
   };
 
   return (
+    <>
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
@@ -739,5 +740,6 @@ export default function AdminIndikatorPage() {
         </div>
       </div>
     )}
+    </>
   );
 }
