@@ -3,9 +3,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, Search } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
+import SearchModal from "@/components/SearchModal";
 
 const navLinks = [
   { href: "/", label: "Beranda" },
@@ -76,6 +77,15 @@ export default function Navbar() {
               >
                 Admin
               </Link>
+              {/* Search */}
+              <button
+                onClick={() => document.dispatchEvent(new CustomEvent("sitara:open-search"))}
+                className="p-2 rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label="Cari"
+                title="Cari (Ctrl+K)"
+              >
+                <Search className="w-4 h-4" />
+              </button>
               {/* Dark mode toggle */}
               <button
                 onClick={toggle}
@@ -94,8 +104,15 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Mobile right: toggle + accessibility + hamburger */}
+            {/* Mobile right: search + toggle + accessibility + hamburger */}
             <div className="md:hidden flex items-center gap-1">
+              <button
+                onClick={() => document.dispatchEvent(new CustomEvent("sitara:open-search"))}
+                className="p-2 rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label="Cari"
+              >
+                <Search className="w-4 h-4" />
+              </button>
               <button
                 onClick={toggle}
                 className="p-2 rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -144,5 +161,6 @@ export default function Navbar() {
         )}
       </nav>
     </header>
+    <SearchModal />
   );
 }

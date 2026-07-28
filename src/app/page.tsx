@@ -7,6 +7,7 @@ import TentangSection from "@/components/beranda/TentangSection";
 import LayananSection from "@/components/beranda/LayananSection";
 import InfografisSection from "@/components/beranda/InfografisSection";
 import VisitorCounter from "@/components/beranda/VisitorCounter";
+import HeroSearch from "@/components/beranda/HeroSearch";
 import Link from "next/link";
 import { ArrowRight, Shield, Database, BarChart3 } from "lucide-react";
 
@@ -53,6 +54,9 @@ export default function BerandaPage() {
                   Layanan BPS
                 </Link>
               </div>
+
+              {/* Search bar */}
+              <HeroSearch />
 
               {/* Trust badges + visitor counter */}
               <div className="mt-8 flex flex-wrap gap-6 border-t border-white/10 pt-6">
