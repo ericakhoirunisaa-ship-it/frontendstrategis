@@ -7,8 +7,10 @@ import { indikatorApi } from "@/lib/api";
 import {
   BarChart2, LineChart, TrendingUp, Filter,
   Download, FileSpreadsheet, FileText, Image as ImageIcon, FileDown,
-  ChevronDown, ChevronRight, BookOpen,
+  ChevronDown, ChevronRight, BookOpen, ChevronLeft, MessageSquare, X,
 } from "lucide-react";
+
+const PAGE_SIZE = 10;
 
 // Fixed 6 categories — labels/colors never change; sub-indicators come from DB
 const CATEGORY_DEFS = [
@@ -43,6 +45,7 @@ interface DataPoint {
   daerah: string;
   kolom: string;
   nilai: number;
+  keterangan?: string | null;
 }
 
 const CHART_TYPES = [
@@ -68,6 +71,18 @@ function buildWideRows(data: DataPoint[]) {
     return ta !== tb ? ta - tb : String(a.daerah).localeCompare(String(b.daerah));
   });
   return { rows, koloms };
+}
+
+// Keterangan map: key = "tahun||daerah", value = keterangan pertama yang ada
+function buildKeteranganMap(data: DataPoint[]): Map<string, { text: string; id: number }> {
+  const map = new Map<string, { text: string; id: number }>();
+  for (const dp of data) {
+    if (dp.keterangan) {
+      const key = `${dp.tahun}||${dp.daerah}`;
+      if (!map.has(key)) map.set(key, { text: dp.keterangan, id: dp.id });
+    }
+  }
+  return map;
 }
 
 // ── Download helpers ──────────────────────────────────────────────────────────
@@ -338,7 +353,12 @@ export default function DataStrategisPage() {
   const [filterTahun, setFilterTahun] = useState("all");
   const [filterDaerah, setFilterDaerah] = useState("all");
   const [filterKolom, setFilterKolom] = useState("all");
+  const [tablePage, setTablePage] = useState(0);
+  const [noteModal, setNoteModal] = useState<{ tahun: number; daerah: string; text: string } | null>(null);
   const chartRef = useRef<HTMLDivElement | null>(null);
+
+  // Reset halaman tabel setiap kali indikator atau filter berubah
+  useEffect(() => { setTablePage(0); }, [selectedInd, filterTahun, filterDaerah, filterKolom]);
 
   useEffect(() => {
     indikatorApi.getAll().then((r) => setDbIndikators(r.data));
@@ -400,6 +420,10 @@ export default function DataStrategisPage() {
     (d) => filterDaerah === "all" || d.daerah === filterDaerah
   );
   const { rows: filteredRows, koloms: filteredKoloms } = buildWideRows(tableData);
+
+  const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
+  const pagedRows = filteredRows.slice(tablePage * PAGE_SIZE, (tablePage + 1) * PAGE_SIZE);
+  const keteranganMap = buildKeteranganMap(tableData);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F5F8FC]">
@@ -604,7 +628,9 @@ export default function DataStrategisPage() {
                   <h3 className="font-semibold text-[#1A1A2E]">
                     Tabel Data
                     {filteredRows.length > 0 && (
-                      <span className="ml-2 text-xs font-normal text-gray-400">{filteredRows.length} baris</span>
+                      <span className="ml-2 text-xs font-normal text-gray-400">
+                        {tablePage * PAGE_SIZE + 1}–{Math.min((tablePage + 1) * PAGE_SIZE, filteredRows.length)} dari {filteredRows.length} baris
+                      </span>
                     )}
                   </h3>
                   <div className="flex gap-1.5 flex-wrap">
@@ -648,25 +674,80 @@ export default function DataStrategisPage() {
                             {formatKolom(k)}
                           </th>
                         ))}
+                        <th className="py-2.5 px-3 text-gray-500 font-semibold whitespace-nowrap w-10"></th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredRows.map((row, i) => (
-                        <tr key={i} className="border-b border-gray-50 hover:bg-blue-50/40 transition-colors">
-                          {!isSingleYear && (
-                            <td className="py-2.5 px-3 text-gray-600 font-medium whitespace-nowrap">{row.tahun as number}</td>
-                          )}
-                          <td className="py-2.5 px-3 text-gray-700 whitespace-nowrap">{row.daerah as string}</td>
-                          {filteredKoloms.map((k) => (
-                            <td key={k} className="py-2.5 px-3 text-right font-semibold text-[#1A1A2E] whitespace-nowrap">
-                              {row[k] != null ? Number(row[k]).toLocaleString("id-ID") : "—"}
+                      {pagedRows.map((row, i) => {
+                        const rowKey = `${row.tahun}||${row.daerah}`;
+                        const note = keteranganMap.get(rowKey);
+                        return (
+                          <tr key={i} className="border-b border-gray-50 hover:bg-blue-50/40 transition-colors">
+                            {!isSingleYear && (
+                              <td className="py-2.5 px-3 text-gray-600 font-medium whitespace-nowrap">{row.tahun as number}</td>
+                            )}
+                            <td className="py-2.5 px-3 text-gray-700 whitespace-nowrap">{row.daerah as string}</td>
+                            {filteredKoloms.map((k) => (
+                              <td key={k} className="py-2.5 px-3 text-right font-semibold text-[#1A1A2E] whitespace-nowrap">
+                                {row[k] != null ? Number(row[k]).toLocaleString("id-ID") : "—"}
+                              </td>
+                            ))}
+                            <td className="py-2.5 px-3 text-center">
+                              {note ? (
+                                <button
+                                  onClick={() => setNoteModal({ tahun: row.tahun as number, daerah: row.daerah as string, text: note.text })}
+                                  className="p-1 rounded-lg text-[#2196F3] hover:bg-blue-50 transition-colors"
+                                  title="Lihat interpretasi"
+                                >
+                                  <MessageSquare className="w-4 h-4" />
+                                </button>
+                              ) : (
+                                <span className="w-4 h-4 block" />
+                              )}
                             </td>
-                          ))}
-                        </tr>
-                      ))}
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
+
+                {/* Paginasi */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                    <button
+                      onClick={() => setTablePage((p) => Math.max(0, p - 1))}
+                      disabled={tablePage === 0}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-500 hover:text-[#2196F3] hover:border-[#2196F3] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" /> Sebelumnya
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => i).map((i) => (
+                        <button
+                          key={i}
+                          onClick={() => setTablePage(i)}
+                          className={`w-7 h-7 rounded-lg text-xs font-semibold transition-colors ${
+                            i === tablePage
+                              ? "bg-[#2196F3] text-white"
+                              : "text-gray-400 hover:bg-gray-100"
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => setTablePage((p) => Math.min(totalPages - 1, p + 1))}
+                      disabled={tablePage === totalPages - 1}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-500 hover:text-[#2196F3] hover:border-[#2196F3] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Berikutnya <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -674,6 +755,36 @@ export default function DataStrategisPage() {
       </div>
 
       <Footer />
+
+      {/* Modal interpretasi data point */}
+      {noteModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ background: "rgba(0,0,0,0.45)" }}
+          onClick={() => setNoteModal(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <MessageSquare className="w-4 h-4 text-[#2196F3]" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#2196F3]">Interpretasi</span>
+                </div>
+                <p className="text-sm font-semibold text-gray-500">
+                  {noteModal.daerah} · {noteModal.tahun}
+                </p>
+              </div>
+              <button onClick={() => setNoteModal(null)} className="p-1 rounded-lg text-gray-400 hover:bg-gray-100">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-700 leading-relaxed">{noteModal.text}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

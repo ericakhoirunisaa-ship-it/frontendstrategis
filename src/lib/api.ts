@@ -86,3 +86,8 @@ export const statsApi = {
   get: () => api.get('/stats'),
   recordVisit: () => api.post('/stats/kunjungan'),
 };
+
+export const dataPointApi = {
+  updateKeterangan: (id: number, keterangan: string) =>
+    api.patch(`/indikator/datapoint/${id}`, { keterangan }),
+};

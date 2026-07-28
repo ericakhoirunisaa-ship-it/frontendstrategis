@@ -2,8 +2,8 @@
 import React from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useEffect, useState, useRef, useMemo } from "react";
-import { indikatorApi, uploadApi } from "@/lib/api";
-import { Plus, Trash2, Upload, Loader2, CheckCircle, AlertCircle, X, Pencil, Search } from "lucide-react";
+import { indikatorApi, uploadApi, dataPointApi } from "@/lib/api";
+import { Plus, Trash2, Upload, Loader2, CheckCircle, AlertCircle, X, Pencil, Search, MessageSquare, Save } from "lucide-react";
 
 interface Indikator {
   id: number;
@@ -21,6 +21,15 @@ interface Indikator {
   filterTahun: boolean;
   filterDaerah: boolean;
   filterKolom: boolean;
+}
+
+interface DataPointRow {
+  id: number;
+  tahun: number;
+  daerah: string;
+  kolom: string;
+  nilai: number;
+  keterangan?: string | null;
 }
 
 const KATEGORI_OPTIONS = [
@@ -64,6 +73,13 @@ export default function AdminIndikatorPage() {
   const [preview, setPreview] = useState<{ headers: string[]; rows: any[]; totalRows: number } | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Keterangan editor
+  const [keteranganInd, setKeteranganInd] = useState<Indikator | null>(null);
+  const [keteranganRows, setKeteranganRows] = useState<DataPointRow[]>([]);
+  const [keteranganEdits, setKeteranganEdits] = useState<Record<number, string>>({});
+  const [keteranganLoading, setKeteranganLoading] = useState(false);
+  const [keteranganSaving, setKeteranganSaving] = useState<number | null>(null);
 
   const load = () => indikatorApi.getAll().then((r) => setIndikators(r.data));
   useEffect(() => { load(); }, []);
@@ -146,6 +162,34 @@ export default function AdminIndikatorPage() {
       setUploadResult({ inserted: 0, errors: [err?.response?.data?.message || "Import gagal"] });
     }
     setUploading(false);
+  };
+
+  const openKeterangan = async (ind: Indikator) => {
+    setKeteranganInd(ind);
+    setKeteranganEdits({});
+    setKeteranganLoading(true);
+    try {
+      const res = await indikatorApi.getBySlug(ind.slug);
+      const rows: DataPointRow[] = res.data.data || [];
+      setKeteranganRows(rows);
+      const edits: Record<number, string> = {};
+      for (const r of rows) edits[r.id] = r.keterangan || "";
+      setKeteranganEdits(edits);
+    } finally {
+      setKeteranganLoading(false);
+    }
+  };
+
+  const saveKeterangan = async (id: number) => {
+    setKeteranganSaving(id);
+    try {
+      await dataPointApi.updateKeterangan(id, keteranganEdits[id] || "");
+      setKeteranganRows((prev) =>
+        prev.map((r) => r.id === id ? { ...r, keterangan: keteranganEdits[id] || null } : r)
+      );
+    } finally {
+      setKeteranganSaving(null);
+    }
   };
 
   return (
@@ -339,6 +383,13 @@ export default function AdminIndikatorPage() {
                     </td>
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => openKeterangan(ind)}
+                          className="p-1.5 rounded-lg transition-colors text-gray-300 dark:text-slate-600 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+                          title="Edit keterangan per data"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => editId === ind.id ? setEditId(null) : openEdit(ind)}
                           className={`p-1.5 rounded-lg transition-colors ${
@@ -595,5 +646,98 @@ export default function AdminIndikatorPage() {
         )}
       </div>
     </AdminLayout>
+
+    {/* Modal Keterangan per Data Point */}
+    {keteranganInd && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center px-4"
+        style={{ background: "rgba(0,0,0,0.5)" }}
+        onClick={() => setKeteranganInd(null)}
+      >
+        <div
+          className="bg-white dark:bg-[#0F1825] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700/50">
+            <div>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-green-600" />
+                <span className="font-semibold text-[#1A1A2E] dark:text-white text-sm">
+                  Keterangan / Interpretasi Data
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{keteranganInd.nama}</p>
+            </div>
+            <button onClick={() => setKeteranganInd(null)} className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="overflow-y-auto flex-1 px-6 py-4">
+            {keteranganLoading ? (
+              <div className="flex items-center justify-center py-16 text-gray-400 text-sm gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Memuat data...
+              </div>
+            ) : keteranganRows.length === 0 ? (
+              <p className="text-center text-gray-400 text-sm py-16">Belum ada data untuk indikator ini.</p>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b-2 border-gray-100 dark:border-slate-700/50">
+                    <th className="text-left py-2 px-2 text-gray-500 dark:text-slate-400 font-medium whitespace-nowrap">Tahun</th>
+                    <th className="text-left py-2 px-2 text-gray-500 dark:text-slate-400 font-medium whitespace-nowrap">Daerah</th>
+                    <th className="text-left py-2 px-2 text-gray-500 dark:text-slate-400 font-medium whitespace-nowrap">Kolom</th>
+                    <th className="text-right py-2 px-2 text-gray-500 dark:text-slate-400 font-medium whitespace-nowrap">Nilai</th>
+                    <th className="text-left py-2 px-2 text-gray-500 dark:text-slate-400 font-medium">Keterangan / Interpretasi</th>
+                    <th className="py-2 px-2 w-10" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {keteranganRows.map((row) => (
+                    <tr key={row.id} className="border-b border-gray-50 dark:border-slate-700/30">
+                      <td className="py-2 px-2 text-gray-600 dark:text-slate-300 whitespace-nowrap">{row.tahun}</td>
+                      <td className="py-2 px-2 text-gray-600 dark:text-slate-300 whitespace-nowrap">{row.daerah}</td>
+                      <td className="py-2 px-2 text-gray-400 dark:text-slate-500 whitespace-nowrap text-xs">{row.kolom}</td>
+                      <td className="py-2 px-2 text-right font-semibold text-[#1A1A2E] dark:text-white whitespace-nowrap">
+                        {Number(row.nilai).toLocaleString("id-ID")}
+                      </td>
+                      <td className="py-2 px-2">
+                        <input
+                          value={keteranganEdits[row.id] ?? ""}
+                          onChange={(e) => setKeteranganEdits((prev) => ({ ...prev, [row.id]: e.target.value }))}
+                          placeholder="Tulis interpretasi angka ini..."
+                          className="w-full px-2 py-1.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-[#0B1120] text-[#1A1A2E] dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-green-200 dark:focus:ring-green-700 placeholder:text-gray-300"
+                        />
+                      </td>
+                      <td className="py-2 px-2">
+                        <button
+                          onClick={() => saveKeterangan(row.id)}
+                          disabled={keteranganSaving === row.id}
+                          className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 disabled:opacity-50 transition-colors"
+                          title="Simpan"
+                        >
+                          {keteranganSaving === row.id
+                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            : <Save className="w-3.5 h-3.5" />
+                          }
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          <div className="px-6 py-3 border-t border-gray-100 dark:border-slate-700/50">
+            <p className="text-xs text-gray-400 dark:text-slate-500">
+              Klik ikon 💾 per baris untuk menyimpan. Keterangan akan muncul di tabel Data Strategis publik.
+            </p>
+          </div>
+        </div>
+      </div>
+    )}
   );
 }
