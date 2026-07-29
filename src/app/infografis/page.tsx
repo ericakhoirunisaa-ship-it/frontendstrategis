@@ -19,45 +19,54 @@ interface Infografis {
 
 async function downloadImage(url: string, judul: string) {
   try {
-    const res  = await fetch(url);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const blob = await res.blob();
-    const ext  = blob.type.includes("png") ? "png" : blob.type.includes("webp") ? "webp" : "jpg";
-    const a    = document.createElement("a");
-    a.href     = URL.createObjectURL(blob);
+    const urlExt = url.split("?")[0].split(".").pop()?.toLowerCase();
+    const ext = ["png", "jpg", "jpeg", "webp"].includes(urlExt || "")
+      ? urlExt === "jpeg" ? "jpg" : urlExt!
+      : blob.type.includes("png") ? "png" : blob.type.includes("webp") ? "webp" : "jpg";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
     a.download = `${judul}.${ext}`;
     a.click();
     URL.revokeObjectURL(a.href);
-  } catch {}
+  } catch (err) {
+    console.error("Gagal unduh gambar:", err);
+    alert("Gagal mengunduh gambar. Pastikan server berjalan dan coba lagi.");
+  }
 }
 
 async function downloadPDF(url: string, judul: string) {
   try {
-    const res    = await fetch(url);
-    const blob   = await res.blob();
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
     const imgSrc = URL.createObjectURL(blob);
-    const img    = new Image();
-    img.src      = imgSrc;
-    await new Promise((r) => { img.onload = r; });
+    const img = new Image();
+    img.src = imgSrc;
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("Gagal memuat gambar"));
+    });
     const { jsPDF } = await import("jspdf");
-    const isPortrait = img.naturalHeight >= img.naturalWidth;
-    const pdf = new jsPDF({ orientation: isPortrait ? "portrait" : "landscape", unit: "mm", format: "a4" });
-    const pw  = pdf.internal.pageSize.getWidth();
-    const ph  = pdf.internal.pageSize.getHeight();
-    const margin = 12;
-    const maxW = pw - margin * 2;
-    const maxH = ph - margin * 2 - 14;
-    const ratio = img.naturalWidth / img.naturalHeight;
-    let w = maxW, h = maxW / ratio;
-    if (h > maxH) { h = maxH; w = maxH * ratio; }
-    const x = (pw - w) / 2;
-    pdf.setFontSize(13); pdf.setTextColor(12, 35, 64);
-    pdf.text(judul, margin, margin + 5);
-    pdf.setFontSize(8); pdf.setTextColor(150);
-    pdf.text("Sumber: BPS Kabupaten Toli-Toli", margin, margin + 10);
-    pdf.addImage(imgSrc, "JPEG", x, margin + 14, w, h);
+    const W = img.naturalWidth  || 1080;
+    const H = img.naturalHeight || 1350;
+    // Gunakan ukuran halaman sesuai dimensi asli infografis (bukan A4)
+    const pdf = new jsPDF({
+      unit: "px",
+      format: [W, H],
+      orientation: H >= W ? "portrait" : "landscape",
+      hotfixes: ["px_scaling"],
+    });
+    const fmt = blob.type.includes("png") ? "PNG" : "JPEG";
+    pdf.addImage(imgSrc, fmt, 0, 0, W, H);
     pdf.save(`${judul}.pdf`);
     URL.revokeObjectURL(imgSrc);
-  } catch {}
+  } catch (err) {
+    console.error("Gagal unduh PDF:", err);
+    alert("Gagal mengunduh PDF. Pastikan server berjalan dan coba lagi.");
+  }
 }
 
 export default function InfografisPage() {
