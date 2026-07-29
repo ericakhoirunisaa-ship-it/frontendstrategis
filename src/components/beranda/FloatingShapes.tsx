@@ -2,7 +2,7 @@
 
 export default function FloatingShapes() {
   return (
-    <div className="relative lg:w-[420px] h-[320px] shrink-0 hidden lg:block overflow-hidden">
+    <div className="relative w-full h-[200px] lg:w-[420px] lg:h-[320px] shrink-0 overflow-hidden">
       <style>{`
         @keyframes floatUp {
           0%, 100% { transform: translateY(0px) rotate(0deg); }

@@ -172,7 +172,7 @@ export default function InfografisPage() {
               <h1 className="text-2xl md:text-3xl font-extrabold text-[#0C2340] dark:text-white mb-1">
                 Infografis BPS Toli-Toli
               </h1>
-              <p className="text-slate-400 dark:text-slate-500 text-sm">
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
                 Visualisasi data statistik Kabupaten Toli-Toli dalam bentuk infografis.
                 {!loading && ` ${items.length} infografis tersedia.`}
               </p>
@@ -180,7 +180,7 @@ export default function InfografisPage() {
 
             {/* Search */}
             <div className="relative sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -188,7 +188,7 @@ export default function InfografisPage() {
                 className="w-full pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-[#162133] text-sm text-[#1A1A2E] dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-700 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
               {search && (
-                <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
@@ -213,7 +213,7 @@ export default function InfografisPage() {
               {search ? `Tidak ada infografis yang cocok dengan "${search}"` : "Belum ada infografis tersedia."}
             </p>
             {search && (
-              <button onClick={() => setSearch("")} className="mt-3 text-sm text-purple-600 hover:underline font-semibold">
+              <button onClick={() => setSearch("")} className="mt-3 text-sm text-purple-600 dark:text-purple-400 hover:underline font-semibold">
                 Hapus pencarian
               </button>
             )}

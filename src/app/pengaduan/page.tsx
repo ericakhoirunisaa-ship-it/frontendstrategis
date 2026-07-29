@@ -19,21 +19,21 @@ function FileField({ label, hint, accept, required, file, onChange }: FileFieldP
   const ref = useRef<HTMLInputElement>(null);
   return (
     <div>
-      <label className="block text-sm font-medium text-[#1A1A2E] mb-1">
+      <label className="block text-sm font-medium text-[#1A1A2E] dark:text-white mb-1">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <div
         onClick={() => ref.current?.click()}
-        className="border-2 border-dashed border-gray-200 rounded-xl px-4 py-5 flex items-center gap-3 cursor-pointer hover:border-[#2196F3] transition-colors"
+        className="border-2 border-dashed border-gray-200 dark:border-slate-700/50 dark:bg-[#162133] rounded-xl px-4 py-5 flex items-center gap-3 cursor-pointer hover:border-[#2196F3] dark:hover:border-[#2196F3] transition-colors"
       >
-        <Upload className="w-5 h-5 text-gray-300 shrink-0" />
+        <Upload className="w-5 h-5 text-gray-300 dark:text-slate-500 shrink-0" />
         <div className="flex-1 min-w-0">
           {file ? (
-            <p className="text-sm text-[#1A1A2E] font-medium truncate">{file.name}</p>
+            <p className="text-sm text-[#1A1A2E] dark:text-white font-medium truncate">{file.name}</p>
           ) : (
             <>
-              <p className="text-sm text-gray-400">Klik untuk pilih file</p>
-              <p className="text-xs text-gray-300 mt-0.5">{hint}</p>
+              <p className="text-sm text-gray-400 dark:text-slate-400">Klik untuk pilih file</p>
+              <p className="text-xs text-gray-300 dark:text-slate-500 mt-0.5">{hint}</p>
             </>
           )}
         </div>
@@ -41,7 +41,7 @@ function FileField({ label, hint, accept, required, file, onChange }: FileFieldP
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onChange(null); if (ref.current) ref.current.value = ""; }}
-            className="shrink-0 text-gray-300 hover:text-red-400 transition-colors"
+            className="shrink-0 text-gray-300 dark:text-slate-500 hover:text-red-400 dark:hover:text-red-400 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -95,25 +95,25 @@ export default function PengaduanPage() {
 
   if (success) {
     return (
-      <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
+      <div className="flex flex-col min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120]">
         <Navbar />
         <main className="flex-1 flex items-center justify-center px-4 py-20">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 max-w-md w-full text-center">
-            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-5">
+          <div className="bg-white dark:bg-[#0F1825] rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700/50 p-10 max-w-md w-full text-center">
+            <div className="w-16 h-16 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-5">
               <CheckCircle className="w-8 h-8 text-green-500" />
             </div>
-            <h2 className="text-xl font-bold text-[#0C2340] mb-2">Pengaduan Terkirim!</h2>
-            <p className="text-slate-500 text-sm leading-relaxed mb-4">
+            <h2 className="text-xl font-bold text-[#0C2340] dark:text-white mb-2">Pengaduan Terkirim!</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-4">
               Terima kasih telah menyampaikan pengaduan Anda. Petugas BPS Kabupaten Toli-Toli
               akan menindaklanjuti laporan ini secepatnya.
             </p>
-            <div className="bg-slate-50 rounded-xl px-4 py-3 text-left mb-6 space-y-1.5">
-              <p className="text-xs text-slate-500">
+            <div className="bg-slate-50 dark:bg-[#162133] rounded-xl px-4 py-3 text-left mb-6 space-y-1.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 📱 Konfirmasi telah dikirim ke nomor WhatsApp Anda.
               </p>
               {form.email && (
-                <p className="text-xs text-slate-500">
-                  📧 Konfirmasi juga dikirim ke <strong>{form.email}</strong>.
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  📧 Konfirmasi juga dikirim ke <strong className="dark:text-slate-300">{form.email}</strong>.
                 </p>
               )}
             </div>
@@ -131,7 +131,7 @@ export default function PengaduanPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
+    <div className="flex flex-col min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120]">
       <Navbar />
 
       <main className="flex-1 py-12 px-4">
@@ -139,23 +139,23 @@ export default function PengaduanPage() {
 
           {/* Header */}
           <div className="mb-8">
-            <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#2196F3] bg-blue-50 px-3 py-1 rounded-lg mb-3">
+            <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#2196F3] bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-lg mb-3">
               Pengaduan
             </span>
-            <h1 className="text-2xl md:text-3xl font-bold text-[#0C2340] mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white mb-2">
               Form Pengaduan
             </h1>
-            <p className="text-slate-500 text-sm leading-relaxed">
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
               Sampaikan pengaduan terkait layanan dan produk statistik BPS Kabupaten Toli-Toli.
               Semua informasi akan dijaga kerahasiaannya.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8 space-y-5">
+          <form onSubmit={handleSubmit} className="bg-white dark:bg-[#0F1825] rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm p-6 md:p-8 space-y-5">
 
             {/* Nama Lengkap */}
             <div>
-              <label className="block text-sm font-medium text-[#1A1A2E] mb-1">
+              <label className="block text-sm font-medium text-[#1A1A2E] dark:text-white mb-1">
                 Nama Lengkap (sesuai KTP) <span className="text-red-500">*</span>
               </label>
               <input
@@ -163,13 +163,13 @@ export default function PengaduanPage() {
                 onChange={(e) => set("namaLengkap", e.target.value)}
                 required
                 placeholder="Nama sesuai KTP/SIM/KK"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 dark:bg-[#162133] dark:text-white dark:placeholder:text-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               />
             </div>
 
             {/* No Identitas */}
             <div>
-              <label className="block text-sm font-medium text-[#1A1A2E] mb-1">
+              <label className="block text-sm font-medium text-[#1A1A2E] dark:text-white mb-1">
                 No. KTP / SIM / KK <span className="text-red-500">*</span>
               </label>
               <input
@@ -177,7 +177,7 @@ export default function PengaduanPage() {
                 onChange={(e) => set("noIdentitas", e.target.value)}
                 required
                 placeholder="16 digit nomor identitas"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 dark:bg-[#162133] dark:text-white dark:placeholder:text-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               />
             </div>
 
@@ -194,7 +194,7 @@ export default function PengaduanPage() {
 
             {/* Alamat */}
             <div>
-              <label className="block text-sm font-medium text-[#1A1A2E] mb-1">
+              <label className="block text-sm font-medium text-[#1A1A2E] dark:text-white mb-1">
                 Alamat Domisili <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -203,13 +203,13 @@ export default function PengaduanPage() {
                 required
                 rows={3}
                 placeholder="Alamat lengkap tempat tinggal saat ini"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 dark:bg-[#162133] dark:text-white dark:placeholder:text-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
               />
             </div>
 
             {/* No Telepon */}
             <div>
-              <label className="block text-sm font-medium text-[#1A1A2E] mb-1">
+              <label className="block text-sm font-medium text-[#1A1A2E] dark:text-white mb-1">
                 No. Telepon / HP / WhatsApp <span className="text-red-500">*</span>
               </label>
               <input
@@ -218,14 +218,14 @@ export default function PengaduanPage() {
                 required
                 type="tel"
                 placeholder="Contoh: 085183287206"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 dark:bg-[#162133] dark:text-white dark:placeholder:text-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               />
-              <p className="text-[11px] text-slate-400 mt-1">Konfirmasi pengaduan akan dikirim ke nomor WhatsApp ini.</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Konfirmasi pengaduan akan dikirim ke nomor WhatsApp ini.</p>
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-[#1A1A2E] mb-1">
+              <label className="block text-sm font-medium text-[#1A1A2E] dark:text-white mb-1">
                 Alamat Email
               </label>
               <input
@@ -233,14 +233,14 @@ export default function PengaduanPage() {
                 onChange={(e) => set("email", e.target.value)}
                 type="email"
                 placeholder="Contoh: nama@email.com"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 dark:bg-[#162133] dark:text-white dark:placeholder:text-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               />
-              <p className="text-[11px] text-slate-400 mt-1">Opsional. Konfirmasi pengaduan akan dikirim ke email ini jika diisi.</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Opsional. Konfirmasi pengaduan akan dikirim ke email ini jika diisi.</p>
             </div>
 
             {/* Isi Pengaduan */}
             <div>
-              <label className="block text-sm font-medium text-[#1A1A2E] mb-1">
+              <label className="block text-sm font-medium text-[#1A1A2E] dark:text-white mb-1">
                 Isi Pengaduan <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -249,7 +249,7 @@ export default function PengaduanPage() {
                 required
                 rows={5}
                 placeholder="Tuliskan pengaduan Anda secara jelas dan terperinci..."
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 dark:bg-[#162133] dark:text-white dark:placeholder:text-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
               />
             </div>
 
@@ -264,7 +264,7 @@ export default function PengaduanPage() {
             />
 
             {error && (
-              <p className="text-sm text-red-500 bg-red-50 rounded-xl px-4 py-3">{error}</p>
+              <p className="text-sm text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl px-4 py-3">{error}</p>
             )}
 
             <div className="flex gap-3 pt-1">
@@ -278,13 +278,13 @@ export default function PengaduanPage() {
               </button>
               <a
                 href="/"
-                className="px-5 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+                className="px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700/50 text-sm font-medium text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-[#162133] transition-colors"
               >
                 Batal
               </a>
             </div>
 
-            <p className="text-[11px] text-gray-400 text-center leading-relaxed">
+            <p className="text-[11px] text-gray-400 dark:text-slate-500 text-center leading-relaxed">
               Dengan mengirim form ini, Anda menyetujui penggunaan data untuk keperluan
               penanganan pengaduan oleh BPS Kabupaten Toli-Toli.
             </p>
