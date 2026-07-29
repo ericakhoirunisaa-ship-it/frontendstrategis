@@ -2,6 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import StatBoxCarousel from "@/components/beranda/StatBoxCarousel";
 import KilasDataSection from "@/components/beranda/KilasDataSection";
+import FloatingShapes from "@/components/beranda/FloatingShapes";
 import JadwalRilisSection from "@/components/beranda/JadwalRilisSection";
 import TentangSection from "@/components/beranda/TentangSection";
 import LayananSection from "@/components/beranda/LayananSection";
@@ -74,26 +75,8 @@ export default function BerandaPage() {
               </div>
             </div>
 
-            {/* Right: quick stat cards */}
-            <div className="grid grid-cols-2 gap-3 lg:w-[360px] shrink-0">
-              {[
-                { label: "Jumlah Penduduk", nilai: "236.020", satuan: "Jiwa", tahun: "2025" },
-                { label: "PDRB", nilai: "7,42 T", satuan: "Rupiah", tahun: "2024" },
-                { label: "Tingkat Kemiskinan", nilai: "13,44%", satuan: "Persentase", tahun: "2024" },
-                { label: "IPM", nilai: "68,12", satuan: "Poin", tahun: "2024" },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="bg-white/5 border border-white/10 rounded-2xl p-4"
-                >
-                  <p className="text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2">
-                    {s.label}
-                  </p>
-                  <p className="text-2xl font-extrabold text-white leading-none mb-0.5">{s.nilai}</p>
-                  <p className="text-[11px] text-white/30">{s.satuan} · {s.tahun}</p>
-                </div>
-              ))}
-            </div>
+            {/* Right: floating animated shapes */}
+            <FloatingShapes />
           </div>
         </div>
 
