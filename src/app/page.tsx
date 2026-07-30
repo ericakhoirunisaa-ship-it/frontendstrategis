@@ -22,7 +22,7 @@ export default function BerandaPage() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
 
             {/* Left text */}
-            <div className="max-w-xl lg:max-w-lg">
+            <div className="max-w-xl">
               {/* Instansi chip */}
               <div className="inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
                 <div className="flex h-3 w-5 overflow-hidden rounded-sm shrink-0">
@@ -72,16 +72,6 @@ export default function BerandaPage() {
                 ))}
                 <VisitorCounter />
               </div>
-            </div>
-
-            {/* Right: ilustrasi data */}
-            <div className="hidden lg:flex flex-1 items-center justify-end shrink-0 max-w-[520px]">
-              <img
-                src="/hero-illustration.png"
-                alt="Ilustrasi data strategis"
-                className="w-full h-auto object-contain select-none pointer-events-none"
-                style={{ filter: "brightness(1.08) contrast(1.05)" }}
-              />
             </div>
 
           </div>
