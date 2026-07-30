@@ -2,7 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import StatBoxCarousel from "@/components/beranda/StatBoxCarousel";
 import KilasDataSection from "@/components/beranda/KilasDataSection";
-import FloatingShapes from "@/components/beranda/FloatingShapes";
+import HeroMap from "@/components/beranda/HeroMap";
 import JadwalRilisSection from "@/components/beranda/JadwalRilisSection";
 import TentangSection from "@/components/beranda/TentangSection";
 import LayananSection from "@/components/beranda/LayananSection";
@@ -75,8 +75,8 @@ export default function BerandaPage() {
               </div>
             </div>
 
-            {/* Right: floating animated shapes */}
-            <FloatingShapes />
+            {/* Right: peta Kab. Toli-Toli */}
+            <HeroMap />
           </div>
         </div>
 
