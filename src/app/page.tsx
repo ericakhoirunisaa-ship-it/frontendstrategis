@@ -8,6 +8,7 @@ import LayananSection from "@/components/beranda/LayananSection";
 import InfografisSection from "@/components/beranda/InfografisSection";
 import VisitorCounter from "@/components/beranda/VisitorCounter";
 import HeroSearch from "@/components/beranda/HeroSearch";
+import HeroIllustration from "@/components/beranda/HeroIllustration";
 import Link from "next/link";
 import { ArrowRight, Shield, Database, BarChart3 } from "lucide-react";
 
@@ -72,6 +73,11 @@ export default function BerandaPage() {
                 ))}
                 <VisitorCounter />
               </div>
+            </div>
+
+            {/* Right: animated illustration */}
+            <div className="hidden lg:flex items-center justify-end flex-1">
+              <HeroIllustration />
             </div>
 
           </div>
