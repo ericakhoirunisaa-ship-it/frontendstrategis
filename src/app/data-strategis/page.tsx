@@ -7,7 +7,7 @@ import { indikatorApi } from "@/lib/api";
 import {
   BarChart2, LineChart, TrendingUp, Filter,
   Download, FileSpreadsheet, FileText, Image as ImageIcon, FileDown,
-  ChevronDown, ChevronRight, BookOpen, ChevronLeft, MessageSquare, X,
+  ChevronDown, ChevronRight, BookOpen, ChevronLeft,
   Share2, Copy, Check,
 } from "lucide-react";
 
@@ -410,7 +410,7 @@ export default function DataStrategisPage() {
   const [filterDaerah, setFilterDaerah] = useState("all");
   const [filterKolom, setFilterKolom] = useState("all");
   const [tablePage, setTablePage] = useState(0);
-  const [noteModal, setNoteModal] = useState<{ tahun: number; daerah: string; text: string } | null>(null);
+  const [hoveredTip, setHoveredTip] = useState<{ text: string; x: number; y: number } | null>(null);
   const chartRef = useRef<HTMLDivElement | null>(null);
 
   // Reset halaman tabel setiap kali indikator atau filter berubah
@@ -731,7 +731,6 @@ export default function DataStrategisPage() {
                             {formatKolom(k)}
                           </th>
                         ))}
-                        <th className="py-2.5 px-3 text-gray-500 dark:text-slate-400 font-semibold whitespace-nowrap w-10"></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -745,23 +744,20 @@ export default function DataStrategisPage() {
                             )}
                             <td className="py-2.5 px-3 text-gray-700 dark:text-slate-300 whitespace-nowrap">{row.daerah as string}</td>
                             {filteredKoloms.map((k) => (
-                              <td key={k} className="py-2.5 px-3 text-right font-semibold text-[#1A1A2E] dark:text-white whitespace-nowrap">
-                                {row[k] != null ? Number(row[k]).toLocaleString("id-ID") : "—"}
+                              <td
+                                key={k}
+                                className="py-2.5 px-3 text-right font-semibold text-[#1A1A2E] dark:text-white whitespace-nowrap"
+                                onMouseEnter={note ? (e) => {
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  setHoveredTip({ text: note.text, x: rect.left + rect.width / 2, y: rect.top });
+                                } : undefined}
+                                onMouseLeave={note ? () => setHoveredTip(null) : undefined}
+                              >
+                                <span className={note ? "border-b border-dashed border-[#2196F3]/40 cursor-help" : ""}>
+                                  {row[k] != null ? Number(row[k]).toLocaleString("id-ID") : "—"}
+                                </span>
                               </td>
                             ))}
-                            <td className="py-2.5 px-3 text-center">
-                              {note ? (
-                                <button
-                                  onClick={() => setNoteModal({ tahun: row.tahun as number, daerah: row.daerah as string, text: note.text })}
-                                  className="p-1 rounded-lg text-[#2196F3] hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
-                                  title="Lihat interpretasi"
-                                >
-                                  <MessageSquare className="w-4 h-4" />
-                                </button>
-                              ) : (
-                                <span className="w-4 h-4 block" />
-                              )}
-                            </td>
                           </tr>
                         );
                       })}
@@ -813,33 +809,21 @@ export default function DataStrategisPage() {
 
       <Footer />
 
-      {/* Modal interpretasi data point */}
-      {noteModal && (
+      {/* Tooltip interpretasi — muncul saat hover angka */}
+      {hoveredTip && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          style={{ background: "rgba(0,0,0,0.45)" }}
-          onClick={() => setNoteModal(null)}
+          className="fixed z-50 pointer-events-none"
+          style={{
+            left: hoveredTip.x,
+            top: hoveredTip.y,
+            transform: "translateX(-50%) translateY(calc(-100% - 10px))",
+          }}
         >
-          <div
-            className="bg-white dark:bg-[#0F1825] rounded-2xl shadow-2xl p-6 max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <MessageSquare className="w-4 h-4 text-[#2196F3]" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#2196F3]">Interpretasi</span>
-                </div>
-                <p className="text-sm font-semibold text-gray-500 dark:text-slate-400">
-                  {noteModal.daerah} · {noteModal.tahun}
-                </p>
-              </div>
-              <button onClick={() => setNoteModal(null)} className="p-1 rounded-lg text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-700/50">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <p className="text-sm text-gray-700 dark:text-slate-300 leading-relaxed">{noteModal.text}</p>
+          <div className="bg-[#0C2340] text-white text-xs rounded-xl px-3.5 py-3 shadow-2xl max-w-xs w-max leading-relaxed border border-white/10">
+            <p className="text-[#60A5FA] text-[10px] font-bold uppercase tracking-wider mb-1.5">Interpretasi</p>
+            <p className="text-white/85">{hoveredTip.text}</p>
           </div>
+          <div style={{ width: 0, height: 0, borderLeft: "6px solid transparent", borderRight: "6px solid transparent", borderTop: "6px solid #0C2340", margin: "0 auto" }} />
         </div>
       )}
     </div>
