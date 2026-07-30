@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, Sun, Moon, Search, MessageSquare } from "lucide-react";
+import { Menu, X, Sun, Moon, Search } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import SearchModal from "@/components/SearchModal";
@@ -99,9 +99,9 @@ export default function Navbar() {
               <AccessibilityWidget />
               <Link
                 href="/layanan-konsultasi"
-                className="btn-primary text-xs px-4 py-2 gap-1.5"
+                className="btn-primary text-xs px-4 py-2"
               >
-                <MessageSquare className="w-3.5 h-3.5" /> Konsultasi Data
+                Konsultasi Data
               </Link>
             </div>
 
