@@ -39,6 +39,7 @@ interface Indikator {
   filterTahun?: boolean;
   filterDaerah?: boolean;
   filterKolom?: boolean;
+  defaultTampilan?: string;
 }
 
 interface DataPoint {
@@ -514,8 +515,15 @@ export default function DataStrategisPage() {
       const uniqueYears = [...new Set(raw.map((d) => d.tahun))].sort((a, b) => a - b);
       const uniqueDaerah = [...new Set(raw.map((d) => d.daerah))];
       const latestYear = uniqueYears.length > 0 ? String(uniqueYears[uniqueYears.length - 1]) : "all";
-      // 1 daerah → tampilkan semua tahun; banyak daerah → tampilkan tahun terbaru dulu
-      setFilterTahun(uniqueDaerah.length > 1 ? latestYear : "all");
+      const mode = ind.defaultTampilan || "auto";
+      const defaultFilter =
+        mode === "all"    ? "all" :
+        mode === "latest" ? latestYear :
+        mode === "last5"  ? "last5" :
+        mode === "last10" ? "last10" :
+        // auto: 1 daerah → semua tahun, banyak daerah → tahun terbaru
+        uniqueDaerah.length > 1 ? latestYear : "all";
+      setFilterTahun(defaultFilter);
       const cols = [...new Set(raw.map((d) => d.kolom))];
       setFilterKolom(uniqueYears.length === 1 ? "all" : (cols[0] || "nilai"));
       setLoading(false);
