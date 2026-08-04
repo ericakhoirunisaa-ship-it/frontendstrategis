@@ -11,6 +11,7 @@ import SearchModal from "@/components/SearchModal";
 const navLinks = [
   { href: "/", label: "Beranda" },
   { href: "/data-strategis", label: "Data Strategis" },
+  { href: "/indikator-bulanan", label: "Indikator Bulanan" },
   { href: "/infografis", label: "Infografis" },
   { href: "/layanan-konsultasi", label: "Layanan" },
 ];

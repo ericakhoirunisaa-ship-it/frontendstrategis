@@ -91,3 +91,16 @@ export const dataPointApi = {
   updateKeterangan: (id: number, keterangan: string) =>
     api.patch(`/indikator/datapoint/${id}`, { keterangan }),
 };
+
+export const indikatorBulananApi = {
+  getAll: (bulan?: number, tahun?: number) => {
+    const params = new URLSearchParams();
+    if (bulan) params.set('bulan', String(bulan));
+    if (tahun) params.set('tahun', String(tahun));
+    return api.get(`/indikator-bulanan?${params}`);
+  },
+  getAllAdmin: () => api.get('/indikator-bulanan/admin'),
+  create: (data: any) => api.post('/indikator-bulanan', data),
+  update: (id: number, data: any) => api.put(`/indikator-bulanan/${id}`, data),
+  delete: (id: number) => api.delete(`/indikator-bulanan/${id}`),
+};

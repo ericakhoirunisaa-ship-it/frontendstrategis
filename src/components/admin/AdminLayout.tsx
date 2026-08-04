@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, LayoutDashboard, Database, Calendar, BarChart2, LogOut, Menu, X, ImageIcon, MessageSquareWarning, Sun, Moon, Map } from "lucide-react";
+import { BarChart3, LayoutDashboard, Database, Calendar, BarChart2, LogOut, Menu, X, ImageIcon, MessageSquareWarning, Sun, Moon, Map, TrendingUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 
@@ -9,6 +9,7 @@ const navItems = [
   { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/statistik", icon: BarChart2, label: "Statistik Beranda" },
   { href: "/admin/indikator", icon: Database, label: "Indikator & Data" },
+  { href: "/admin/indikator-bulanan", icon: TrendingUp, label: "Indikator Bulanan" },
   { href: "/admin/jadwal-rilis", icon: Calendar, label: "Jadwal Rilis" },
   { href: "/admin/infografis", icon: ImageIcon, label: "Infografis" },
   { href: "/admin/peta-tematik", icon: Map, label: "Peta Tematik" },
