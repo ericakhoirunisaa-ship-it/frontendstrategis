@@ -512,8 +512,10 @@ export default function DataStrategisPage() {
       const raw: DataPoint[] = r.data.data || [];
       setData(raw);
       const uniqueYears = [...new Set(raw.map((d) => d.tahun))].sort((a, b) => a - b);
+      const uniqueDaerah = [...new Set(raw.map((d) => d.daerah))];
       const latestYear = uniqueYears.length > 0 ? String(uniqueYears[uniqueYears.length - 1]) : "all";
-      setFilterTahun(uniqueYears.length > 1 ? latestYear : "all");
+      // 1 daerah → tampilkan semua tahun; banyak daerah → tampilkan tahun terbaru dulu
+      setFilterTahun(uniqueDaerah.length > 1 ? latestYear : "all");
       const cols = [...new Set(raw.map((d) => d.kolom))];
       setFilterKolom(uniqueYears.length === 1 ? "all" : (cols[0] || "nilai"));
       setLoading(false);
