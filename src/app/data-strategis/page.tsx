@@ -527,18 +527,36 @@ export default function DataStrategisPage() {
   const showFilterDaerah = selectedInd?.filterDaerah ?? true;
   const showFilterKolom  = selectedInd?.filterKolom  ?? true;
 
-  // Filter options derived from raw data (so dropdowns always show all available options)
-  const tahunOptions  = ["all", ...[...new Set(data.map((d) => String(d.tahun)))].sort()];
+  // Derived year/daerah sets
+  const allYears = [...new Set(data.map((d) => d.tahun))].sort((a, b) => a - b);
+  const maxYear  = allYears.length > 0 ? allYears[allYears.length - 1] : 0;
+  const dataHasMultiYears  = allYears.length > 1;
+  const dataHasMultiDaerah = new Set(data.map((d) => d.daerah)).size > 1;
+
+  // Year filter options: special ranges first, then individual years newest→oldest
+  const tahunOptions = [
+    "all",
+    ...(allYears.length >= 10 ? ["last10"] : []),
+    ...(allYears.length >= 5  ? ["last5"]  : []),
+    ...[...allYears].reverse().map(String),
+  ];
+
+  const TAHUN_LABEL: Record<string, string> = {
+    all:    "Semua Tahun",
+    last5:  "5 Tahun Terakhir",
+    last10: "10 Tahun Terakhir",
+  };
+
+  // Filter options for daerah
   const daerahOptions = ["all", ...new Set(data.map((d) => d.daerah))];
   const kolomOptions  = [...new Set(data.map((d) => d.kolom))];
 
-  // Whether raw data spans multiple years (controls showing the tahun dropdown)
-  const dataHasMultiYears = new Set(data.map((d) => d.tahun)).size > 1;
-
   // Data filtered by tahun — passed to DynamicChart; DynamicChart handles daerah/kolom internally
-  const tahunFilteredData = filterTahun === "all"
-    ? data
-    : data.filter((d) => String(d.tahun) === filterTahun);
+  const tahunFilteredData =
+    filterTahun === "all"    ? data :
+    filterTahun === "last5"  ? data.filter((d) => d.tahun >= maxYear - 4) :
+    filterTahun === "last10" ? data.filter((d) => d.tahun >= maxYear - 9) :
+    data.filter((d) => String(d.tahun) === filterTahun);
 
   // After tahun filter, determine if we're now showing a single year
   const isSingleYear =
@@ -680,13 +698,13 @@ export default function DataStrategisPage() {
                           className="text-sm border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-1.5 bg-white dark:bg-[#162133] text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-200"
                         >
                           {tahunOptions.map((t) => (
-                            <option key={t} value={t}>{t === "all" ? "Semua Tahun" : t}</option>
+                            <option key={t} value={t}>{TAHUN_LABEL[t] ?? t}</option>
                           ))}
                         </select>
                       )}
 
-                      {/* Daerah */}
-                      {showFilterDaerah ? (
+                      {/* Daerah — hanya tampil jika data punya lebih dari 1 daerah */}
+                      {showFilterDaerah && dataHasMultiDaerah && (
                         <select
                           value={filterDaerah}
                           onChange={(e) => setFilterDaerah(e.target.value)}
@@ -698,10 +716,6 @@ export default function DataStrategisPage() {
                             </option>
                           ))}
                         </select>
-                      ) : (
-                        <span className="text-sm border border-gray-200 dark:border-slate-700/50 rounded-lg px-3 py-1.5 bg-gray-50 dark:bg-[#162133] text-gray-500 dark:text-slate-400">
-                          {isSingleYear ? "Semua Kelompok" : "Semua Daerah"}
-                        </span>
                       )}
 
                       {/* Kolom */}
