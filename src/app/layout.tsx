@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   title: "SITARA — Sistem Informasi Indikator Strategis Kabupaten Toli-Toli",
   description: "Sistem Informasi Indikator Strategis (SITARA) BPS Kabupaten Toli-Toli, Sulawesi Tengah",
   keywords: ["BPS", "Toli-Toli", "SITARA", "indikator strategis", "statistik", "kabupaten"],
+  icons: { icon: "/logo-sitara.png" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
