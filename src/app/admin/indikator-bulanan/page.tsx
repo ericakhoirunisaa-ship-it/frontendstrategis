@@ -131,18 +131,6 @@ export default function AdminIndikatorBulananPage() {
     });
   };
 
-  // Group items by tahun-bulan
-  const groups: { key: string; tahun: number; bulan: number; items: IndikatorBulanan[] }[] = [];
-  const seen = new Set<string>();
-  for (const item of items) {
-    const key = `${item.tahun}-${item.bulan}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      groups.push({ key, tahun: item.tahun, bulan: item.bulan, items: [] });
-    }
-    groups[groups.length - 1 + [...seen].indexOf(key) - [...seen].size + 1]?.items.push(item);
-  }
-  // Rebuild properly
   const groupMap = new Map<string, IndikatorBulanan[]>();
   for (const item of items) {
     const key = `${item.tahun}-${item.bulan}`;
