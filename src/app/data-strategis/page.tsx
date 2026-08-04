@@ -542,9 +542,9 @@ export default function DataStrategisPage() {
   ];
 
   const TAHUN_LABEL: Record<string, string> = {
-    all:    "Semua Tahun",
-    last5:  "5 Tahun Terakhir",
-    last10: "10 Tahun Terakhir",
+    all:    "Semua",
+    last5:  "5Y",
+    last10: "10Y",
   };
 
   // Filter options for daerah
@@ -690,17 +690,26 @@ export default function DataStrategisPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <Filter className="w-4 h-4 text-gray-400 dark:text-slate-500 shrink-0" />
 
-                      {/* Tahun */}
+                      {/* Tahun — pill buttons */}
                       {showFilterTahun && dataHasMultiYears && (
-                        <select
-                          value={filterTahun}
-                          onChange={(e) => setFilterTahun(e.target.value)}
-                          className="text-sm border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-1.5 bg-white dark:bg-[#162133] text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-200"
-                        >
-                          {tahunOptions.map((t) => (
-                            <option key={t} value={t}>{TAHUN_LABEL[t] ?? t}</option>
-                          ))}
-                        </select>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-400 dark:text-slate-500 shrink-0">Periode:</span>
+                          <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#162133] p-1 rounded-xl flex-wrap">
+                            {tahunOptions.map((t) => (
+                              <button
+                                key={t}
+                                onClick={() => setFilterTahun(t)}
+                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                                  filterTahun === t
+                                    ? "bg-white dark:bg-[#0F1825] text-[#1A1A2E] dark:text-white shadow-sm"
+                                    : "text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300"
+                                }`}
+                              >
+                                {TAHUN_LABEL[t] ?? t}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       )}
 
                       {/* Daerah — hanya tampil jika data punya lebih dari 1 daerah */}
