@@ -521,8 +521,8 @@ export default function DataStrategisPage() {
         mode === "latest" ? latestYear :
         mode === "last5"  ? "last5" :
         mode === "last10" ? "last10" :
-        // auto: 1 daerah → semua tahun, banyak daerah → tahun terbaru
-        uniqueDaerah.length > 1 ? latestYear : "all";
+        // auto: ≤2 daerah → semua tahun, >2 daerah → tahun terbaru
+        uniqueDaerah.length > 2 ? latestYear : "all";
       setFilterTahun(defaultFilter);
       const cols = [...new Set(raw.map((d) => d.kolom))];
       setFilterKolom(uniqueYears.length === 1 ? "all" : (cols[0] || "nilai"));
@@ -539,7 +539,8 @@ export default function DataStrategisPage() {
   const allYears = [...new Set(data.map((d) => d.tahun))].sort((a, b) => a - b);
   const maxYear  = allYears.length > 0 ? allYears[allYears.length - 1] : 0;
   const dataHasMultiYears  = allYears.length > 1;
-  const dataHasMultiDaerah = new Set(data.map((d) => d.daerah)).size > 1;
+  const uniqueDaerahCount  = new Set(data.map((d) => d.daerah)).size;
+  const dataHasMultiDaerah = uniqueDaerahCount > 2;
 
   // Year filter options: special ranges first, then individual years newest→oldest
   const tahunOptions = [
@@ -667,7 +668,13 @@ export default function DataStrategisPage() {
                       {showFilterTahun && dataHasMultiYears && (
                         <>
                           <span className="w-px bg-gray-200 dark:bg-slate-600 mx-0.5 self-stretch" />
-                          {(["all", ...(allYears.length >= 5 ? ["last5"] : []), ...(allYears.length >= 10 ? ["last10"] : [])] as string[]).map((t) => (
+                          {[
+                            "all",
+                            ...(allYears.length >= 5  ? ["last5"]  : []),
+                            ...(allYears.length >= 10 ? ["last10"] : []),
+                            // tahun individual hanya muncul jika daerah > 2
+                            ...(dataHasMultiDaerah ? [...allYears].reverse().map(String) : []),
+                          ].map((t) => (
                             <button
                               key={t}
                               onClick={() => setFilterTahun(t)}
@@ -717,8 +724,8 @@ export default function DataStrategisPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <Filter className="w-4 h-4 text-gray-400 dark:text-slate-500 shrink-0" />
 
-                      {/* Filter tahun individual — dropdown tahun spesifik */}
-                      {showFilterTahun && dataHasMultiYears && (
+                      {/* Filter tahun — dropdown hanya jika daerah > 2 */}
+                      {showFilterTahun && dataHasMultiYears && dataHasMultiDaerah && (
                         <select
                           value={["all","last5","last10"].includes(filterTahun) ? "all" : filterTahun}
                           onChange={(e) => setFilterTahun(e.target.value)}
