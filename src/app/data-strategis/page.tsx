@@ -40,6 +40,7 @@ interface Indikator {
   filterDaerah?: boolean;
   filterKolom?: boolean;
   defaultTampilan?: string;
+  labelDaerah?: string;
 }
 
 interface DataPoint {
@@ -169,10 +170,10 @@ async function downloadWord(ref: React.RefObject<HTMLDivElement | null>, nama: s
   triggerDownload(new Blob(["﻿", html], { type: "application/msword" }), `${nama}.doc`);
 }
 
-function downloadCSV(rows: Record<string, unknown>[], koloms: string[], nama: string, isSingle: boolean) {
+function downloadCSV(rows: Record<string, unknown>[], koloms: string[], nama: string, isSingle: boolean, lblDaerah = "Daerah") {
   const headers = isSingle
-    ? ["Kelompok", ...koloms.map(formatKolom)]
-    : ["Tahun", "Daerah", ...koloms.map(formatKolom)];
+    ? [lblDaerah, ...koloms.map(formatKolom)]
+    : ["Tahun", lblDaerah, ...koloms.map(formatKolom)];
   const body = rows.map((r) => {
     const base = isSingle ? [r.daerah] : [r.tahun, r.daerah];
     return [...base, ...koloms.map((k) => r[k] ?? "")].join(",");
@@ -183,11 +184,11 @@ function downloadCSV(rows: Record<string, unknown>[], koloms: string[], nama: st
   );
 }
 
-async function downloadExcel(rows: Record<string, unknown>[], koloms: string[], nama: string, isSingle: boolean) {
+async function downloadExcel(rows: Record<string, unknown>[], koloms: string[], nama: string, isSingle: boolean, lblDaerah = "Daerah") {
   const XLSX = await import("xlsx");
   const headers = isSingle
-    ? ["Kelompok", ...koloms.map(formatKolom)]
-    : ["Tahun", "Daerah", ...koloms.map(formatKolom)];
+    ? [lblDaerah, ...koloms.map(formatKolom)]
+    : ["Tahun", lblDaerah, ...koloms.map(formatKolom)];
   const sheetRows = rows.map((r) => {
     const base = isSingle ? [r.daerah] : [r.tahun, r.daerah];
     return [...base, ...koloms.map((k) => r[k] ?? "")];
@@ -198,13 +199,13 @@ async function downloadExcel(rows: Record<string, unknown>[], koloms: string[], 
   XLSX.writeFile(wb, `${nama}.xlsx`);
 }
 
-async function downloadTablePDF(rows: Record<string, unknown>[], koloms: string[], nama: string, isSingle: boolean) {
+async function downloadTablePDF(rows: Record<string, unknown>[], koloms: string[], nama: string, isSingle: boolean, lblDaerah = "Daerah") {
   const { jsPDF } = await import("jspdf");
   const { default: autoTable } = await import("jspdf-autotable");
   const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
   const head = isSingle
-    ? [["Kelompok", ...koloms.map(formatKolom)]]
-    : [["Tahun", "Daerah", ...koloms.map(formatKolom)]];
+    ? [[lblDaerah, ...koloms.map(formatKolom)]]
+    : [["Tahun", lblDaerah, ...koloms.map(formatKolom)]];
   const body = rows.map((r) => {
     const base = isSingle ? [String(r.daerah)] : [String(r.tahun), String(r.daerah)];
     return [...base, ...koloms.map((k) => r[k] != null ? Number(r[k]).toLocaleString("id-ID") : "—")];
@@ -534,6 +535,7 @@ export default function DataStrategisPage() {
   const showFilterTahun  = selectedInd?.filterTahun  ?? true;
   const showFilterDaerah = selectedInd?.filterDaerah ?? true;
   const showFilterKolom  = selectedInd?.filterKolom  ?? true;
+  const labelDaerah = selectedInd?.labelDaerah || "Daerah";
 
   // Derived year/daerah sets
   const allYears = [...new Set(data.map((d) => d.tahun))].sort((a, b) => a - b);
@@ -747,7 +749,7 @@ export default function DataStrategisPage() {
                         >
                           {daerahOptions.map((d) => (
                             <option key={d} value={d}>
-                              {d === "all" ? (isSingleYear ? "Semua Kelompok" : "Semua Daerah") : d}
+                              {d === "all" ? `Semua ${labelDaerah}` : d}
                             </option>
                           ))}
                         </select>
@@ -815,19 +817,19 @@ export default function DataStrategisPage() {
                   </h3>
                   <div className="flex gap-1.5 flex-wrap">
                     <button
-                      onClick={() => downloadCSV(filteredRows, filteredKoloms, selectedInd.nama, isSingleYear)}
+                      onClick={() => downloadCSV(filteredRows, filteredKoloms, selectedInd.nama, isSingleYear, labelDaerah)}
                       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700/50 text-xs text-gray-500 dark:text-slate-400 hover:text-green-600 hover:border-green-400 transition-colors"
                     >
                       <Download className="w-3.5 h-3.5" /> CSV
                     </button>
                     <button
-                      onClick={() => downloadExcel(filteredRows, filteredKoloms, selectedInd.nama, isSingleYear)}
+                      onClick={() => downloadExcel(filteredRows, filteredKoloms, selectedInd.nama, isSingleYear, labelDaerah)}
                       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700/50 text-xs text-gray-500 dark:text-slate-400 hover:text-green-600 hover:border-green-400 transition-colors"
                     >
                       <FileSpreadsheet className="w-3.5 h-3.5" /> Excel
                     </button>
                     <button
-                      onClick={() => downloadTablePDF(filteredRows, filteredKoloms, selectedInd.nama, isSingleYear)}
+                      onClick={() => downloadTablePDF(filteredRows, filteredKoloms, selectedInd.nama, isSingleYear, labelDaerah)}
                       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700/50 text-xs text-gray-500 dark:text-slate-400 hover:text-red-500 hover:border-red-400 transition-colors"
                     >
                       <FileText className="w-3.5 h-3.5" /> PDF
@@ -847,7 +849,7 @@ export default function DataStrategisPage() {
                           <th className="text-left py-2.5 px-3 text-gray-500 dark:text-slate-400 font-semibold whitespace-nowrap">Tahun</th>
                         )}
                         <th className="text-left py-2.5 px-3 text-gray-500 dark:text-slate-400 font-semibold whitespace-nowrap">
-                          {isSingleYear ? "Kelompok" : "Daerah"}
+                          {labelDaerah}
                         </th>
                         {filteredKoloms.map((k) => (
                           <th key={k} className="text-right py-2.5 px-3 text-gray-500 dark:text-slate-400 font-semibold whitespace-nowrap">

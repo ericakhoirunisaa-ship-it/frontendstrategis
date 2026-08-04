@@ -22,6 +22,7 @@ interface Indikator {
   filterDaerah: boolean;
   filterKolom: boolean;
   defaultTampilan: string;
+  labelDaerah?: string;
 }
 
 interface DataPointRow {
@@ -46,7 +47,7 @@ const KATEGORI_OPTIONS = [
 const EMPTY_FORM = {
   nama: "", satuan: "", kategori: "Lainnya", tipeChart: "bar",
   deskripsi: "", definisi: "", metodologi: "", sumberData: "", interpretasi: "",
-  filterTahun: true, filterDaerah: true, filterKolom: true, defaultTampilan: "auto",
+  filterTahun: true, filterDaerah: true, filterKolom: true, defaultTampilan: "auto", labelDaerah: "",
 };
 
 const DEFAULT_TAMPILAN_OPTIONS = [
@@ -60,7 +61,7 @@ const DEFAULT_TAMPILAN_OPTIONS = [
 type EditForm = {
   nama: string; satuan: string; kategori: string; tipeChart: string;
   deskripsi: string; definisi: string; metodologi: string; sumberData: string; interpretasi: string;
-  filterTahun: boolean; filterDaerah: boolean; filterKolom: boolean; defaultTampilan: string;
+  filterTahun: boolean; filterDaerah: boolean; filterKolom: boolean; defaultTampilan: string; labelDaerah: string;
 };
 
 const INPUT_CLS = "w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-[#0B1120] text-[#1A1A2E] dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-700 placeholder:text-gray-400 dark:placeholder:text-slate-500";
@@ -73,7 +74,7 @@ export default function AdminIndikatorPage() {
   const [saving, setSaving] = useState(false);
 
   const [editId, setEditId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<EditForm>({ nama: "", satuan: "", kategori: "Lainnya", tipeChart: "bar", deskripsi: "", definisi: "", metodologi: "", sumberData: "", interpretasi: "", filterTahun: true, filterDaerah: true, filterKolom: true, defaultTampilan: "auto" });
+  const [editForm, setEditForm] = useState<EditForm>({ nama: "", satuan: "", kategori: "Lainnya", tipeChart: "bar", deskripsi: "", definisi: "", metodologi: "", sumberData: "", interpretasi: "", filterTahun: true, filterDaerah: true, filterKolom: true, defaultTampilan: "auto", labelDaerah: "" });
   const [editSaving, setEditSaving] = useState(false);
 
   const [uploadIndId, setUploadIndId] = useState<number | null>(null);
@@ -130,7 +131,7 @@ export default function AdminIndikatorPage() {
       deskripsi: ind.deskripsi || "", definisi: ind.definisi || "",
       metodologi: ind.metodologi || "", sumberData: ind.sumberData || "", interpretasi: ind.interpretasi || "",
       filterTahun: ind.filterTahun ?? true, filterDaerah: ind.filterDaerah ?? true, filterKolom: ind.filterKolom ?? true,
-      defaultTampilan: ind.defaultTampilan || "auto",
+      defaultTampilan: ind.defaultTampilan || "auto", labelDaerah: ind.labelDaerah || "",
     });
     setShowForm(false);
     setUploadIndId(null);
@@ -323,17 +324,28 @@ export default function AdminIndikatorPage() {
               </div>
               <div className="col-span-2 border-t border-gray-100 dark:border-slate-700/50 pt-3">
                 <p className="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">Pengaturan Filter & Tampilan Awal</p>
-                <div className="mb-4">
-                  <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Tampilan Awal Data</label>
-                  <select
-                    value={form.defaultTampilan}
-                    onChange={(e) => setForm({ ...form, defaultTampilan: e.target.value })}
-                    className={INPUT_CLS}
-                  >
-                    {DEFAULT_TAMPILAN_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Tampilan Awal Data</label>
+                    <select
+                      value={form.defaultTampilan}
+                      onChange={(e) => setForm({ ...form, defaultTampilan: e.target.value })}
+                      className={INPUT_CLS}
+                    >
+                      {DEFAULT_TAMPILAN_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Label Kelompok / Daerah</label>
+                    <input
+                      value={form.labelDaerah}
+                      onChange={(e) => setForm({ ...form, labelDaerah: e.target.value })}
+                      placeholder="Daerah, Kecamatan, Kelompok Usia, Jenjang Pendidikan…"
+                      className={INPUT_CLS}
+                    />
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-5">
                   {([
@@ -520,17 +532,28 @@ export default function AdminIndikatorPage() {
                           </div>
                           <div className="col-span-2 border-t border-gray-100 dark:border-slate-700/50 pt-3">
                             <p className="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">Pengaturan Filter & Tampilan Awal</p>
-                            <div className="mb-4">
-                              <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Tampilan Awal Data</label>
-                              <select
-                                value={editForm.defaultTampilan}
-                                onChange={(e) => setEditForm({ ...editForm, defaultTampilan: e.target.value })}
-                                className={INPUT_CLS}
-                              >
-                                {DEFAULT_TAMPILAN_OPTIONS.map((o) => (
-                                  <option key={o.value} value={o.value}>{o.label}</option>
-                                ))}
-                              </select>
+                            <div className="grid grid-cols-2 gap-3 mb-4">
+                              <div>
+                                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Tampilan Awal Data</label>
+                                <select
+                                  value={editForm.defaultTampilan}
+                                  onChange={(e) => setEditForm({ ...editForm, defaultTampilan: e.target.value })}
+                                  className={INPUT_CLS}
+                                >
+                                  {DEFAULT_TAMPILAN_OPTIONS.map((o) => (
+                                    <option key={o.value} value={o.value}>{o.label}</option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Label Kelompok / Daerah</label>
+                                <input
+                                  value={editForm.labelDaerah}
+                                  onChange={(e) => setEditForm({ ...editForm, labelDaerah: e.target.value })}
+                                  placeholder="Daerah, Kecamatan, Kelompok Usia, Jenjang Pendidikan…"
+                                  className={INPUT_CLS}
+                                />
+                              </div>
                             </div>
                             <div className="flex flex-wrap gap-5">
                               {([
