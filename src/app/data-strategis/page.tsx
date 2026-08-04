@@ -641,7 +641,7 @@ export default function DataStrategisPage() {
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    {/* Toggle tipe chart */}
+                    {/* Toggle tipe chart + periode tahun */}
                     <div className="flex gap-1 bg-gray-100 dark:bg-[#162133] p-1 rounded-lg">
                       {CHART_TYPES.map(({ value, icon: Icon, label }) => (
                         <button
@@ -655,6 +655,25 @@ export default function DataStrategisPage() {
                           <Icon className="w-4 h-4" />
                         </button>
                       ))}
+                      {/* Pemisah & tombol periode — hanya jika data multi-tahun */}
+                      {showFilterTahun && dataHasMultiYears && (
+                        <>
+                          <span className="w-px bg-gray-200 dark:bg-slate-600 mx-0.5 self-stretch" />
+                          {(["all", ...(allYears.length >= 5 ? ["last5"] : []), ...(allYears.length >= 10 ? ["last10"] : [])] as string[]).map((t) => (
+                            <button
+                              key={t}
+                              onClick={() => setFilterTahun(t)}
+                              className={`px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+                                filterTahun === t
+                                  ? "bg-white dark:bg-[#0F1825] shadow text-[#2196F3]"
+                                  : "text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
+                              }`}
+                            >
+                              {TAHUN_LABEL[t] ?? t}
+                            </button>
+                          ))}
+                        </>
+                      )}
                     </div>
                     {/* Download grafik */}
                     <div className="flex gap-1.5 flex-wrap">
@@ -690,26 +709,18 @@ export default function DataStrategisPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <Filter className="w-4 h-4 text-gray-400 dark:text-slate-500 shrink-0" />
 
-                      {/* Tahun — pill buttons */}
+                      {/* Filter tahun individual — dropdown tahun spesifik */}
                       {showFilterTahun && dataHasMultiYears && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-400 dark:text-slate-500 shrink-0">Periode:</span>
-                          <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#162133] p-1 rounded-xl flex-wrap">
-                            {tahunOptions.map((t) => (
-                              <button
-                                key={t}
-                                onClick={() => setFilterTahun(t)}
-                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                                  filterTahun === t
-                                    ? "bg-white dark:bg-[#0F1825] text-[#1A1A2E] dark:text-white shadow-sm"
-                                    : "text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300"
-                                }`}
-                              >
-                                {TAHUN_LABEL[t] ?? t}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                        <select
+                          value={["all","last5","last10"].includes(filterTahun) ? "all" : filterTahun}
+                          onChange={(e) => setFilterTahun(e.target.value)}
+                          className="text-sm border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-1.5 bg-white dark:bg-[#162133] text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        >
+                          <option value="all">Semua Tahun</option>
+                          {[...allYears].reverse().map((t) => (
+                            <option key={t} value={String(t)}>{t}</option>
+                          ))}
+                        </select>
                       )}
 
                       {/* Daerah — hanya tampil jika data punya lebih dari 1 daerah */}
