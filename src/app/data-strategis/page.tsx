@@ -441,7 +441,9 @@ export default function DataStrategisPage() {
     indikatorApi.getBySlug(ind.slug).then((r) => {
       const raw: DataPoint[] = r.data.data || [];
       setData(raw);
-      const uniqueYears = [...new Set(raw.map((d) => d.tahun))];
+      const uniqueYears = [...new Set(raw.map((d) => d.tahun))].sort((a, b) => a - b);
+      const latestYear = uniqueYears.length > 0 ? String(uniqueYears[uniqueYears.length - 1]) : "all";
+      setFilterTahun(uniqueYears.length > 1 ? latestYear : "all");
       const cols = [...new Set(raw.map((d) => d.kolom))];
       setFilterKolom(uniqueYears.length === 1 ? "all" : (cols[0] || "nilai"));
       setLoading(false);
