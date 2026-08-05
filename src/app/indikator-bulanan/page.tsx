@@ -212,12 +212,12 @@ export default function IndikatorBulananPage() {
       <div className="bg-white dark:bg-[#0F1825] border-b border-slate-100 dark:border-slate-700/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-xs font-bold rounded-full uppercase tracking-wider mb-3">
-            <BarChart2 className="w-3.5 h-3.5" /> Indikator Bulanan
+            <BarChart2 className="w-3.5 h-3.5" /> Ringkasan Indikator
           </span>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-extrabold text-[#0C2340] dark:text-white mb-1">
-                Indikator Bulanan Kabupaten Toli-Toli
+                Ringkasan Indikator Kabupaten Toli-Toli
               </h1>
               <p className="text-slate-500 dark:text-slate-400 text-sm">
                 Ringkasan indikator statistik pilihan periode{" "}

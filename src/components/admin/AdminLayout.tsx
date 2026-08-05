@@ -9,7 +9,7 @@ const navItems = [
   { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/statistik", icon: BarChart2, label: "Statistik Beranda" },
   { href: "/admin/indikator", icon: Database, label: "Indikator & Data" },
-  { href: "/admin/indikator-bulanan", icon: TrendingUp, label: "Indikator Bulanan" },
+  { href: "/admin/indikator-bulanan", icon: TrendingUp, label: "Ringkasan Indikator" },
   { href: "/admin/jadwal-rilis", icon: Calendar, label: "Jadwal Rilis" },
   { href: "/admin/infografis", icon: ImageIcon, label: "Infografis" },
   { href: "/admin/peta-tematik", icon: Map, label: "Peta Tematik" },

@@ -159,7 +159,7 @@ export default function AdminIndikatorBulananPage() {
         {/* Top bar */}
         <div className="flex items-center justify-between">
           <p className="text-gray-500 dark:text-slate-400 text-sm">
-            Kelola data indikator statistik bulanan yang ditampilkan di halaman publik.
+            Kelola data tambahan yang ditampilkan di halaman Ringkasan Indikator publik.
           </p>
           <button
             onClick={openAdd}
@@ -187,7 +187,7 @@ export default function AdminIndikatorBulananPage() {
           <div className="bg-white dark:bg-[#162133] rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-[#0C2340] dark:text-white text-sm">
-                {editing ? "Edit Data Indikator Bulanan" : "Tambah Data Indikator Bulanan"}
+                {editing ? "Edit Data Ringkasan Indikator" : "Tambah Data Ringkasan Indikator"}
               </h3>
               <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-200">
                 <X className="w-4 h-4" />
