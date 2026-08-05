@@ -99,6 +99,13 @@ export const indikatorBulananApi = {
     if (tahun) params.set('tahun', String(tahun));
     return api.get(`/indikator-bulanan?${params}`);
   },
+  getCombined: (bulan?: number, tahun?: number) => {
+    const params = new URLSearchParams();
+    if (bulan) params.set('bulan', String(bulan));
+    if (tahun) params.set('tahun', String(tahun));
+    return api.get(`/indikator-bulanan/combined?${params}`);
+  },
+  getStrategisYears: () => api.get('/indikator-bulanan/strategis-years'),
   getAllAdmin: () => api.get('/indikator-bulanan/admin'),
   create: (data: any) => api.post('/indikator-bulanan', data),
   update: (id: number, data: any) => api.put(`/indikator-bulanan/${id}`, data),

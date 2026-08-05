@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { indikatorBulananApi } from "@/lib/api";
-import { TrendingUp, TrendingDown, Minus, BarChart2, ChevronLeft, ChevronRight } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, BarChart2, ChevronLeft, ChevronRight, Zap } from "lucide-react";
 
 interface IndikatorBulanan {
   id: number;
@@ -18,6 +18,7 @@ interface IndikatorBulanan {
   urutan: number;
   bulan: number;
   tahun: number;
+  sumber?: "manual" | "strategis";
 }
 
 const WARNA_MAP: Record<string, { bg: string; text: string; soft: string; border: string }> = {
@@ -43,14 +44,27 @@ function StatCard({ item }: { item: IndikatorBulanan }) {
   const w = WARNA_MAP[item.warna] ?? WARNA_MAP.biru;
   const naik = item.arahPerubahan === "naik";
   const turun = item.arahPerubahan === "turun";
+  const isAuto = item.sumber === "strategis";
 
   return (
     <div
-      className="rounded-2xl overflow-hidden shadow-sm border transition-all hover:-translate-y-0.5 hover:shadow-md"
+      className="rounded-2xl overflow-hidden shadow-sm border transition-all hover:-translate-y-0.5 hover:shadow-md relative"
       style={{ borderColor: w.border, background: w.soft }}
     >
+      {/* Auto badge */}
+      {isAuto && (
+        <span
+          className="absolute top-2 right-2 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+          style={{ background: "rgba(255,255,255,0.85)", color: w.bg }}
+          title="Data otomatis dari Indikator Strategis"
+        >
+          <Zap className="w-2.5 h-2.5" />
+          Auto
+        </span>
+      )}
+
       {/* Colored header */}
-      <div className="px-4 py-3" style={{ background: w.bg }}>
+      <div className="px-4 py-3 pr-14" style={{ background: w.bg }}>
         <p className="text-white/80 text-[11px] font-semibold uppercase tracking-wider line-clamp-2 leading-tight">
           {item.judul}
         </p>
@@ -105,51 +119,90 @@ export default function IndikatorBulananPage() {
   const [tahun, setTahun] = useState(def.tahun);
   const [items, setItems] = useState<IndikatorBulanan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [availTahun, setAvailTahun] = useState<number[]>([]);
   const [availPeriodes, setAvailPeriodes] = useState<{ bulan: number; tahun: number }[]>([]);
 
-  // Load available periods once
+  // Load available tahun once (from manual entries + strategis years)
   useEffect(() => {
-    indikatorBulananApi.getAll()
-      .then((r) => {
-        const data: IndikatorBulanan[] = r.data;
-        const seen = new Set<string>();
-        const periods: { bulan: number; tahun: number }[] = [];
-        data.forEach((d) => {
-          const key = `${d.tahun}-${d.bulan}`;
-          if (!seen.has(key)) { seen.add(key); periods.push({ bulan: d.bulan, tahun: d.tahun }); }
-        });
-        periods.sort((a, b) => b.tahun - a.tahun || b.bulan - a.bulan);
-        setAvailPeriodes(periods);
-        // Set to latest available period if current month has no data
-        if (periods.length > 0) {
-          const hasCurrent = periods.some((p) => p.bulan === def.bulan && p.tahun === def.tahun);
-          if (!hasCurrent) { setBulan(periods[0].bulan); setTahun(periods[0].tahun); }
-        }
-      })
-      .catch(() => {});
+    Promise.all([
+      indikatorBulananApi.getAll().catch(() => ({ data: [] })),
+      indikatorBulananApi.getStrategisYears().catch(() => ({ data: { years: [] } })),
+    ]).then(([manualRes, strategisRes]) => {
+      const manualData: IndikatorBulanan[] = manualRes.data ?? [];
+      const strategisYears: number[] = strategisRes.data?.years ?? [];
+
+      // Collect periods from manual entries
+      const seen = new Set<string>();
+      const periods: { bulan: number; tahun: number }[] = [];
+      manualData.forEach((d) => {
+        const key = `${d.tahun}-${d.bulan}`;
+        if (!seen.has(key)) { seen.add(key); periods.push({ bulan: d.bulan, tahun: d.tahun }); }
+      });
+      periods.sort((a, b) => b.tahun - a.tahun || b.bulan - a.bulan);
+      setAvailPeriodes(periods);
+
+      // Collect unique tahun from both sources
+      const tahunSet = new Set<number>([
+        ...manualData.map((d) => d.tahun),
+        ...strategisYears,
+        def.tahun, // always include current year
+      ]);
+      const sortedTahun = Array.from(tahunSet).sort((a, b) => b - a);
+      setAvailTahun(sortedTahun);
+
+      // If current month+year has no data, jump to most recent manual period
+      const hasCurrent = periods.some((p) => p.bulan === def.bulan && p.tahun === def.tahun);
+      const hasCurrentYear = strategisYears.includes(def.tahun);
+      if (!hasCurrent && !hasCurrentYear && periods.length > 0) {
+        setBulan(periods[0].bulan);
+        setTahun(periods[0].tahun);
+      }
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Load combined data whenever bulan/tahun changes
   useEffect(() => {
     setLoading(true);
-    indikatorBulananApi.getAll(bulan, tahun)
+    indikatorBulananApi.getCombined(bulan, tahun)
       .then((r) => setItems(r.data))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
   }, [bulan, tahun]);
 
-  const currentIdx = availPeriodes.findIndex((p) => p.bulan === bulan && p.tahun === tahun);
-  const hasPrev = currentIdx < availPeriodes.length - 1;
+  // Period navigation (based on manual periods union strategis months)
+  const allPeriods = (() => {
+    const set = new Set<string>();
+    const result: { bulan: number; tahun: number }[] = [];
+    // Add all 12 months for each strategis year
+    for (const t of availTahun) {
+      for (let b = 12; b >= 1; b--) {
+        const key = `${t}-${b}`;
+        if (!set.has(key)) { set.add(key); result.push({ bulan: b, tahun: t }); }
+      }
+    }
+    // Add manual periods not already covered
+    for (const p of availPeriodes) {
+      const key = `${p.tahun}-${p.bulan}`;
+      if (!set.has(key)) { set.add(key); result.push(p); }
+    }
+    return result.sort((a, b) => b.tahun - a.tahun || b.bulan - a.bulan);
+  })();
+
+  const currentIdx = allPeriods.findIndex((p) => p.bulan === bulan && p.tahun === tahun);
+  const hasPrev = currentIdx < allPeriods.length - 1;
   const hasNext = currentIdx > 0;
 
   const goPrev = () => {
-    if (hasPrev) { const p = availPeriodes[currentIdx + 1]; setBulan(p.bulan); setTahun(p.tahun); }
+    if (hasPrev) { const p = allPeriods[currentIdx + 1]; setBulan(p.bulan); setTahun(p.tahun); }
   };
   const goNext = () => {
-    if (hasNext) { const p = availPeriodes[currentIdx - 1]; setBulan(p.bulan); setTahun(p.tahun); }
+    if (hasNext) { const p = allPeriods[currentIdx - 1]; setBulan(p.bulan); setTahun(p.tahun); }
   };
 
-  const tahunOptions = Array.from(new Set(availPeriodes.map((p) => p.tahun))).sort((a, b) => b - a);
+  const tahunOptions = availTahun.length > 0 ? availTahun : [tahun];
+  const autoCount = items.filter((i) => i.sumber === "strategis").length;
+  const manualCount = items.filter((i) => i.sumber === "manual").length;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120]">
@@ -172,6 +225,23 @@ export default function IndikatorBulananPage() {
                   {BULAN_LABEL[bulan]} {tahun}
                 </span>
               </p>
+              {/* Data source summary */}
+              {!loading && items.length > 0 && (
+                <div className="flex items-center gap-2 mt-1.5">
+                  {autoCount > 0 && (
+                    <span className="inline-flex items-center gap-1 text-[10px] text-slate-400">
+                      <Zap className="w-3 h-3 text-blue-400" />
+                      {autoCount} dari Indikator Strategis
+                    </span>
+                  )}
+                  {autoCount > 0 && manualCount > 0 && (
+                    <span className="text-slate-200 dark:text-slate-700 text-[10px]">•</span>
+                  )}
+                  {manualCount > 0 && (
+                    <span className="text-[10px] text-slate-400">{manualCount} tambahan manual</span>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Period navigation */}
@@ -201,7 +271,7 @@ export default function IndikatorBulananPage() {
                 onChange={(e) => setTahun(+e.target.value)}
                 className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-[#162133] text-sm text-[#0C2340] dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-700"
               >
-                {(tahunOptions.length > 0 ? tahunOptions : [tahun]).map((t) => (
+                {tahunOptions.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
@@ -238,13 +308,33 @@ export default function IndikatorBulananPage() {
             <p className="text-slate-500 dark:text-slate-400 font-medium">
               Belum ada data untuk periode {BULAN_LABEL[bulan]} {tahun}.
             </p>
-            {availPeriodes.length > 0 && (
-              <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">
-                Coba pilih periode lain di atas.
-              </p>
-            )}
+            <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">
+              Coba pilih periode lain di atas.
+            </p>
           </div>
+        ) : manualCount > 0 && autoCount > 0 ? (
+          /* Both manual and strategis — show in separate sections */
+          <>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+              Tambahan Manual
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+              {items.filter((i) => i.sumber === "manual").map((item) => (
+                <StatCard key={item.id} item={item} />
+              ))}
+            </div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <Zap className="w-3 h-3 text-blue-400" />
+              Dari Indikator Strategis {tahun}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {items.filter((i) => i.sumber === "strategis").map((item) => (
+                <StatCard key={item.id} item={item} />
+              ))}
+            </div>
+          </>
         ) : (
+          /* Only one source — show flat grid */
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {items.map((item) => (
               <StatCard key={item.id} item={item} />

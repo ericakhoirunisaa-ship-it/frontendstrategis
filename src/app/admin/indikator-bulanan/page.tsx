@@ -2,7 +2,7 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useEffect, useState } from "react";
 import { indikatorBulananApi } from "@/lib/api";
-import { Plus, Pencil, Trash2, X, Check, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronRight, Zap, Info } from "lucide-react";
 
 interface IndikatorBulanan {
   id: number;
@@ -48,6 +48,7 @@ const EMPTY: Omit<IndikatorBulanan, "id" | "aktif"> = {
 
 export default function AdminIndikatorBulananPage() {
   const [items, setItems] = useState<IndikatorBulanan[]>([]);
+  const [strategisYears, setStrategisYears] = useState<number[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<IndikatorBulanan | null>(null);
   const [form, setForm] = useState(EMPTY);
@@ -67,7 +68,12 @@ export default function AdminIndikatorBulananPage() {
       })
       .catch(() => {});
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    indikatorBulananApi.getStrategisYears()
+      .then((r) => setStrategisYears(r.data?.years ?? []))
+      .catch(() => {});
+  }, []);
 
   const openAdd = () => {
     setEditing(null);
@@ -162,6 +168,19 @@ export default function AdminIndikatorBulananPage() {
             <Plus className="w-4 h-4" /> Tambah Data
           </button>
         </div>
+
+        {/* Auto-derivation info banner */}
+        {strategisYears.length > 0 && (
+          <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 rounded-xl">
+            <Zap className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-700 dark:text-blue-300">
+              <span className="font-semibold">Data otomatis aktif</span>
+              <span className="text-blue-600 dark:text-blue-400"> — Semua data Indikator Strategis untuk tahun </span>
+              <span className="font-semibold">{strategisYears.join(", ")}</span>
+              <span className="text-blue-600 dark:text-blue-400"> otomatis muncul di halaman publik untuk setiap bulan pada tahun tersebut. Naik/turun dihitung otomatis dari tahun sebelumnya. Gunakan form di bawah untuk menambah data manual (misalnya indikator tambahan yang tidak ada di Strategis).</span>
+            </div>
+          </div>
+        )}
 
         {/* Form */}
         {showForm && (
