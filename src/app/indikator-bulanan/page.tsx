@@ -59,38 +59,47 @@ async function downloadRingkasanPDF(
     parseInt(hex.slice(5, 7), 16),
   ];
 
-  const drawPageHeader = () => {
-    pdf.setFillColor(0, 82, 165);
-    pdf.rect(ml, 8, 3, 14, "F");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(8.5);
-    pdf.setTextColor(0, 82, 165);
-    pdf.text("BADAN PUSAT STATISTIK", ml + 6, 13.5);
-    pdf.setFontSize(8);
-    pdf.text("KABUPATEN TOLI-TOLI", ml + 6, 18.5);
-    pdf.setDrawColor(0, 82, 165);
-    pdf.setLineWidth(0.6);
-    pdf.line(ml, 26, pw - mr, 26);
-    pdf.setLineWidth(0.2);
-    pdf.setDrawColor(200, 200, 200);
-    pdf.line(ml, 27, pw - mr, 27);
-  };
+  // Load logo dari /logo-sitara.png
+  let logoDataUrl: string | null = null;
+  try {
+    const res = await fetch("/logo-sitara.png");
+    const blob = await res.blob();
+    logoDataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch { /* fallback: tanpa logo */ }
 
-  const drawTitle = () => {
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(20);
-    pdf.setTextColor(234, 88, 12);
-    pdf.text("RINGKASAN INDIKATOR", pw / 2, 37, { align: "center" });
-    pdf.setFontSize(12);
-    pdf.setTextColor(0, 82, 165);
-    pdf.text("KABUPATEN TOLI-TOLI", pw / 2, 44, { align: "center" });
-    pdf.setFont("helvetica", "italic");
-    pdf.setFontSize(8.5);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text(`Periode Rilis Data: ${BULAN_LABEL[bulan]} ${tahun}`, pw / 2, 50, { align: "center" });
-  };
+  // ── Header ─────────────────────────────────────────────────
+  if (logoDataUrl) {
+    pdf.addImage(logoDataUrl, "PNG", ml, 5, 18, 18);
+  }
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(8.5);
+  pdf.setTextColor(0, 82, 165);
+  pdf.text("BADAN PUSAT STATISTIK", ml + 21, 11);
+  pdf.setFontSize(8);
+  pdf.text("KABUPATEN TOLI-TOLI", ml + 21, 17);
+  pdf.setDrawColor(0, 82, 165);
+  pdf.setLineWidth(0.6);
+  pdf.line(ml, 25, pw - mr, 25);
+  pdf.setLineWidth(0.15);
+  pdf.setDrawColor(200, 200, 200);
+  pdf.line(ml, 26, pw - mr, 26);
 
-  const drawPageFooter = () => {
+  // ── Judul ──────────────────────────────────────────────────
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(19);
+  pdf.setTextColor(234, 88, 12);
+  pdf.text("RINGKASAN INDIKATOR", pw / 2, 35, { align: "center" });
+  pdf.setFontSize(11);
+  pdf.setTextColor(0, 82, 165);
+  pdf.text("KABUPATEN TOLI-TOLI", pw / 2, 42, { align: "center" });
+
+  // ── Footer ─────────────────────────────────────────────────
+  const drawFooter = () => {
     const fy = ph - 20;
     pdf.setFillColor(255, 247, 237);
     pdf.setDrawColor(253, 186, 116);
@@ -118,67 +127,7 @@ async function downloadRingkasanPDF(
     pdf.text("tolitolikab.bps.go.id", pw - mr, dy + 1, { align: "right" });
   };
 
-  const drawCard = (item: IndikatorBulanan, x: number, y: number, cardW: number, cardH: number) => {
-    const wc = WARNA_MAP[item.warna] ?? WARNA_MAP.biru;
-    const [bgR, bgG, bgB] = hex2rgb(wc.bg);
-    const [sfR, sfG, sfB] = hex2rgb(wc.soft);
-    const [brR, brG, brB] = hex2rgb(wc.border);
-
-    pdf.setFillColor(sfR, sfG, sfB);
-    pdf.setDrawColor(brR, brG, brB);
-    pdf.setLineWidth(0.3);
-    pdf.roundedRect(x, y, cardW, cardH, 2.5, 2.5, "FD");
-
-    pdf.setFillColor(bgR, bgG, bgB);
-    pdf.roundedRect(x, y, cardW, 9, 2.5, 2.5, "F");
-    pdf.rect(x, y + 5, cardW, 4, "F");
-
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(6.5);
-    pdf.setTextColor(255, 255, 255);
-    const titleLines = pdf.splitTextToSize(item.judul.toUpperCase(), cardW - 5);
-    pdf.text(titleLines[0], x + 2.5, y + 6.5);
-
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(15);
-    pdf.setTextColor(12, 35, 64);
-    pdf.text(item.nilai, x + 3, y + 19.5);
-
-    if (item.satuan) {
-      const vw = pdf.getTextWidth(item.nilai);
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(6.5);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text(item.satuan, x + 3 + vw + 1, y + 19.5);
-    }
-
-    if (item.perubahan) {
-      const naik = item.arahPerubahan === "naik";
-      const turun = item.arahPerubahan === "turun";
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(7);
-      pdf.setTextColor(
-        naik ? 5 : turun ? 220 : 100,
-        naik ? 150 : turun ? 38 : 100,
-        naik ? 105 : turun ? 38 : 100,
-      );
-      pdf.text(item.perubahan, x + 3, y + 25.5);
-    } else if (item.keterangan ?? item.periode) {
-      const note = (item.keterangan ?? item.periode ?? "").trim();
-      if (note) {
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(6);
-        pdf.setTextColor(100, 100, 100);
-        const noteLines = pdf.splitTextToSize(note, cardW - 6);
-        pdf.text(noteLines[0], x + 3, y + 25.5);
-      }
-    }
-  };
-
-  // ── Layout ────────────────────────────────────────────────
-  drawPageHeader();
-  drawTitle();
-
+  // ── Kelompokkan item per periode ───────────────────────────
   const grouped: [string, IndikatorBulanan[]][] = [];
   const seenPeriode = new Map<string, IndikatorBulanan[]>();
   for (const item of items) {
@@ -191,46 +140,132 @@ async function downloadRingkasanPDF(
     seenPeriode.get(key)!.push(item);
   }
 
-  const gapX = 5, gapY = 3;
-  const cardW = (cw - gapX) / 2;
-  const cardH = 28;
-  const footerTop = ph - 23;
-  let y = 55;
+  // ── Hitung cardH agar muat 1 halaman ──────────────────────
+  const cardsStart = 46;            // y mulai kartu
+  const footerTop  = ph - 22;       // y batas bawah (sebelum footer)
+  const availH     = footerTop - cardsStart;
 
-  for (const [periode, cards] of grouped) {
-    if (y + 10 > footerTop) {
-      drawPageFooter();
-      pdf.addPage();
-      drawPageHeader();
-      y = 31;
+  const nGroups   = grouped.length;
+  const labelH    = 8;              // tinggi label periode
+  const gapAfterLabel = 2;
+  const interGroupGap = 4;
+  const gapX      = 4;
+  const gapY      = 2;
+
+  const totalRows = grouped.reduce(
+    (sum, [, cards]) => sum + Math.ceil(cards.length / 2), 0
+  );
+  const labelSpace = nGroups * (labelH + gapAfterLabel) +
+    Math.max(0, nGroups - 1) * interGroupGap;
+  const cardRowsH  = availH - labelSpace;
+  const rawCardH   = totalRows > 0
+    ? (cardRowsH - Math.max(0, totalRows - 1) * gapY) / totalRows
+    : 30;
+  const cardH = Math.max(16, Math.min(30, rawCardH));
+
+  // Font sizes proporsional terhadap cardH
+  const hdrH      = Math.min(8, cardH * 0.38);
+  const valueFsz  = cardH >= 24 ? 13 : cardH >= 20 ? 11 : 9;
+  const changeFsz = cardH >= 20 ? 6.5 : 6;
+  const titleFsz  = 6;
+
+  // ── Gambar kartu ───────────────────────────────────────────
+  const cardW = (cw - gapX) / 2;
+
+  const drawCard = (item: IndikatorBulanan, x: number, y: number) => {
+    const wc = WARNA_MAP[item.warna] ?? WARNA_MAP.biru;
+    const [bgR, bgG, bgB] = hex2rgb(wc.bg);
+    const [sfR, sfG, sfB] = hex2rgb(wc.soft);
+    const [brR, brG, brB] = hex2rgb(wc.border);
+
+    // Shell kartu
+    pdf.setFillColor(sfR, sfG, sfB);
+    pdf.setDrawColor(brR, brG, brB);
+    pdf.setLineWidth(0.25);
+    pdf.roundedRect(x, y, cardW, cardH, 2, 2, "FD");
+
+    // Header berwarna
+    pdf.setFillColor(bgR, bgG, bgB);
+    pdf.roundedRect(x, y, cardW, hdrH, 2, 2, "F");
+    pdf.rect(x, y + hdrH - 2, cardW, 2, "F");
+
+    // Judul di header
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(titleFsz);
+    pdf.setTextColor(255, 255, 255);
+    const titleLines = pdf.splitTextToSize(item.judul.toUpperCase(), cardW - 4);
+    pdf.text(titleLines[0], x + 2, y + hdrH * 0.72);
+
+    // Nilai
+    const bodyTop = y + hdrH;
+    const bodyH   = cardH - hdrH;
+    const valueY  = bodyTop + bodyH * 0.58;
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(valueFsz);
+    pdf.setTextColor(12, 35, 64);
+    pdf.text(item.nilai, x + 2.5, valueY);
+
+    // Satuan
+    if (item.satuan) {
+      const vw = pdf.getTextWidth(item.nilai);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(5.5);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(item.satuan, x + 2.5 + vw + 0.8, valueY);
     }
+
+    // Perubahan
+    const changeY = bodyTop + bodyH * 0.88;
+    if (item.perubahan) {
+      const naik = item.arahPerubahan === "naik";
+      const turun = item.arahPerubahan === "turun";
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(changeFsz);
+      pdf.setTextColor(
+        naik ? 5 : turun ? 220 : 100,
+        naik ? 150 : turun ? 38 : 100,
+        naik ? 105 : turun ? 38 : 100,
+      );
+      pdf.text(item.perubahan, x + 2.5, changeY);
+    } else if (item.keterangan ?? item.periode) {
+      const note = (item.keterangan ?? item.periode ?? "").trim();
+      if (note) {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(5.5);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(pdf.splitTextToSize(note, cardW - 5)[0], x + 2.5, changeY);
+      }
+    }
+  };
+
+  // ── Render semua grup ──────────────────────────────────────
+  let y = cardsStart;
+
+  for (let gi = 0; gi < grouped.length; gi++) {
+    const [periode, cards] = grouped[gi];
+
+    // Label periode (kuning)
     pdf.setFillColor(254, 243, 199);
     pdf.setDrawColor(251, 191, 36);
-    pdf.setLineWidth(0.3);
-    pdf.roundedRect(ml, y, cw, 8, 2, 2, "FD");
+    pdf.setLineWidth(0.25);
+    pdf.roundedRect(ml, y, cw, labelH, 1.5, 1.5, "FD");
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(8);
+    pdf.setFontSize(7.5);
     pdf.setTextColor(92, 60, 0);
-    pdf.text(periode, ml + 4, y + 5.5);
-    y += 10;
+    pdf.text(periode, ml + 3.5, y + labelH * 0.7);
+    y += labelH + gapAfterLabel;
 
+    // Kartu dalam 2 kolom
     let col = 0;
     for (const item of cards) {
       if (col === 2) { col = 0; y += cardH + gapY; }
-      if (y + cardH > footerTop) {
-        drawPageFooter();
-        pdf.addPage();
-        drawPageHeader();
-        y = 31;
-        col = 0;
-      }
-      drawCard(item, ml + col * (cardW + gapX), y, cardW, cardH);
+      drawCard(item, ml + col * (cardW + gapX), y);
       col++;
     }
-    y += cardH + gapY + 5;
+    y += cardH + (gi < grouped.length - 1 ? interGroupGap : 0);
   }
 
-  drawPageFooter();
+  drawFooter();
   pdf.save(`Ringkasan-Indikator-${BULAN_LABEL[bulan]}-${tahun}.pdf`);
 }
 
