@@ -92,6 +92,18 @@ export const dataPointApi = {
     api.patch(`/indikator/datapoint/${id}`, { keterangan }),
 };
 
+export const portalDaerahApi = {
+  getAll: (params?: { search?: string; dinas?: string; topik?: string; admin?: boolean }) =>
+    api.get('/portal-daerah', { params: { ...params, admin: params?.admin ? 'true' : undefined } }),
+  getById: (id: number) => api.get(`/portal-daerah/${id}`),
+  incrementView: (id: number) => api.post(`/portal-daerah/${id}/view`),
+  create: (data: any) => api.post('/portal-daerah', data),
+  update: (id: number, data: any) => api.put(`/portal-daerah/${id}`, data),
+  replaceRows: (id: number, data: { columns: string[]; rows: any[] }) =>
+    api.post(`/portal-daerah/${id}/rows`, data),
+  delete: (id: number) => api.delete(`/portal-daerah/${id}`),
+};
+
 export const indikatorBulananApi = {
   getAll: (bulan?: number, tahun?: number) => {
     const params = new URLSearchParams();
