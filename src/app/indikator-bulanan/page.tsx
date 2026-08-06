@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { indikatorBulananApi } from "@/lib/api";
-import { TrendingUp, TrendingDown, Minus, BarChart2, ChevronLeft, ChevronRight, Zap } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, BarChart2, ChevronLeft, ChevronRight, Zap, FileText } from "lucide-react";
 
 interface IndikatorBulanan {
   id: number;
@@ -39,6 +39,202 @@ function getDefaultPeriode() {
   const now = new Date();
   return { bulan: now.getMonth() + 1, tahun: now.getFullYear() };
 }
+
+// ── PDF Download ──────────────────────────────────────────────────────────────
+
+async function downloadRingkasanPDF(
+  items: IndikatorBulanan[],
+  bulan: number,
+  tahun: number,
+) {
+  if (!items.length) return;
+  const { jsPDF } = await import("jspdf");
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+  const pw = 210, ph = 297, ml = 10, mr = 10, cw = pw - ml - mr;
+
+  const hex2rgb = (hex: string): [number, number, number] => [
+    parseInt(hex.slice(1, 3), 16),
+    parseInt(hex.slice(3, 5), 16),
+    parseInt(hex.slice(5, 7), 16),
+  ];
+
+  const drawPageHeader = () => {
+    pdf.setFillColor(0, 82, 165);
+    pdf.rect(ml, 8, 3, 14, "F");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(0, 82, 165);
+    pdf.text("BADAN PUSAT STATISTIK", ml + 6, 13.5);
+    pdf.setFontSize(8);
+    pdf.text("KABUPATEN TOLI-TOLI", ml + 6, 18.5);
+    pdf.setDrawColor(0, 82, 165);
+    pdf.setLineWidth(0.6);
+    pdf.line(ml, 26, pw - mr, 26);
+    pdf.setLineWidth(0.2);
+    pdf.setDrawColor(200, 200, 200);
+    pdf.line(ml, 27, pw - mr, 27);
+  };
+
+  const drawTitle = () => {
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(20);
+    pdf.setTextColor(234, 88, 12);
+    pdf.text("RINGKASAN INDIKATOR", pw / 2, 37, { align: "center" });
+    pdf.setFontSize(12);
+    pdf.setTextColor(0, 82, 165);
+    pdf.text("KABUPATEN TOLI-TOLI", pw / 2, 44, { align: "center" });
+    pdf.setFont("helvetica", "italic");
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text(`Periode Rilis Data: ${BULAN_LABEL[bulan]} ${tahun}`, pw / 2, 50, { align: "center" });
+  };
+
+  const drawPageFooter = () => {
+    const fy = ph - 20;
+    pdf.setFillColor(255, 247, 237);
+    pdf.setDrawColor(253, 186, 116);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(ml, fy, cw, 12, 2, 2, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(154, 52, 18);
+    pdf.text("Informasi lebih lanjut kunjungi:", ml + 4, fy + 5);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7);
+    pdf.setTextColor(29, 111, 202);
+    pdf.text("https://strategis7206.zeabur.app/", ml + 4, fy + 10);
+    pdf.text("https://tolitolikab.bps.go.id/id", pw / 2 + 4, fy + 10);
+    const dy = ph - 5;
+    ([
+      [0, 82, 165], [234, 88, 12], [5, 150, 105],
+    ] as [number, number, number][]).forEach(([r, g, b], i) => {
+      pdf.setFillColor(r, g, b);
+      pdf.circle(ml + i * 6, dy, 1.8, "F");
+    });
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8);
+    pdf.setTextColor(80, 80, 80);
+    pdf.text("tolitolikab.bps.go.id", pw - mr, dy + 1, { align: "right" });
+  };
+
+  const drawCard = (item: IndikatorBulanan, x: number, y: number, cardW: number, cardH: number) => {
+    const wc = WARNA_MAP[item.warna] ?? WARNA_MAP.biru;
+    const [bgR, bgG, bgB] = hex2rgb(wc.bg);
+    const [sfR, sfG, sfB] = hex2rgb(wc.soft);
+    const [brR, brG, brB] = hex2rgb(wc.border);
+
+    pdf.setFillColor(sfR, sfG, sfB);
+    pdf.setDrawColor(brR, brG, brB);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(x, y, cardW, cardH, 2.5, 2.5, "FD");
+
+    pdf.setFillColor(bgR, bgG, bgB);
+    pdf.roundedRect(x, y, cardW, 9, 2.5, 2.5, "F");
+    pdf.rect(x, y + 5, cardW, 4, "F");
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(6.5);
+    pdf.setTextColor(255, 255, 255);
+    const titleLines = pdf.splitTextToSize(item.judul.toUpperCase(), cardW - 5);
+    pdf.text(titleLines[0], x + 2.5, y + 6.5);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(15);
+    pdf.setTextColor(12, 35, 64);
+    pdf.text(item.nilai, x + 3, y + 19.5);
+
+    if (item.satuan) {
+      const vw = pdf.getTextWidth(item.nilai);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(6.5);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(item.satuan, x + 3 + vw + 1, y + 19.5);
+    }
+
+    if (item.perubahan) {
+      const naik = item.arahPerubahan === "naik";
+      const turun = item.arahPerubahan === "turun";
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(7);
+      pdf.setTextColor(
+        naik ? 5 : turun ? 220 : 100,
+        naik ? 150 : turun ? 38 : 100,
+        naik ? 105 : turun ? 38 : 100,
+      );
+      pdf.text(item.perubahan, x + 3, y + 25.5);
+    } else if (item.keterangan ?? item.periode) {
+      const note = (item.keterangan ?? item.periode ?? "").trim();
+      if (note) {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(6);
+        pdf.setTextColor(100, 100, 100);
+        const noteLines = pdf.splitTextToSize(note, cardW - 6);
+        pdf.text(noteLines[0], x + 3, y + 25.5);
+      }
+    }
+  };
+
+  // ── Layout ────────────────────────────────────────────────
+  drawPageHeader();
+  drawTitle();
+
+  const grouped: [string, IndikatorBulanan[]][] = [];
+  const seenPeriode = new Map<string, IndikatorBulanan[]>();
+  for (const item of items) {
+    const key = item.periode?.trim() || `${BULAN_LABEL[bulan]} ${tahun}`;
+    if (!seenPeriode.has(key)) {
+      const arr: IndikatorBulanan[] = [];
+      seenPeriode.set(key, arr);
+      grouped.push([key, arr]);
+    }
+    seenPeriode.get(key)!.push(item);
+  }
+
+  const gapX = 5, gapY = 3;
+  const cardW = (cw - gapX) / 2;
+  const cardH = 28;
+  const footerTop = ph - 23;
+  let y = 55;
+
+  for (const [periode, cards] of grouped) {
+    if (y + 10 > footerTop) {
+      drawPageFooter();
+      pdf.addPage();
+      drawPageHeader();
+      y = 31;
+    }
+    pdf.setFillColor(254, 243, 199);
+    pdf.setDrawColor(251, 191, 36);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(ml, y, cw, 8, 2, 2, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8);
+    pdf.setTextColor(92, 60, 0);
+    pdf.text(periode, ml + 4, y + 5.5);
+    y += 10;
+
+    let col = 0;
+    for (const item of cards) {
+      if (col === 2) { col = 0; y += cardH + gapY; }
+      if (y + cardH > footerTop) {
+        drawPageFooter();
+        pdf.addPage();
+        drawPageHeader();
+        y = 31;
+        col = 0;
+      }
+      drawCard(item, ml + col * (cardW + gapX), y, cardW, cardH);
+      col++;
+    }
+    y += cardH + gapY + 5;
+  }
+
+  drawPageFooter();
+  pdf.save(`Ringkasan-Indikator-${BULAN_LABEL[bulan]}-${tahun}.pdf`);
+}
+
+// ── StatCard ──────────────────────────────────────────────────────────────────
 
 function StatCard({ item }: { item: IndikatorBulanan }) {
   const w = WARNA_MAP[item.warna] ?? WARNA_MAP.biru;
@@ -282,6 +478,17 @@ export default function IndikatorBulananPage() {
                 className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
+              </button>
+
+              {/* Download PDF */}
+              <button
+                onClick={() => downloadRingkasanPDF(items, bulan, tahun)}
+                disabled={loading || items.length === 0}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                title="Download PDF Ringkasan Indikator"
+              >
+                <FileText className="w-4 h-4" />
+                PDF
               </button>
             </div>
           </div>
