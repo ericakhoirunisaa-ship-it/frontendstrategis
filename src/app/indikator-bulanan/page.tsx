@@ -67,8 +67,8 @@ function computeCardH(
   const labelSpace = nGroups * (labelH + gapAfterLabel) + Math.max(0, nGroups - 1) * interGroupGap;
   const raw = totalRows > 0
     ? (availH - labelSpace - Math.max(0, totalRows - 1) * gapY) / totalRows
-    : 30;
-  return Math.max(16, Math.min(30, raw));
+    : 38;
+  return Math.max(18, Math.min(40, raw));
 }
 
 async function loadImageDataUrl(src: string): Promise<string | null> {
@@ -94,130 +94,177 @@ async function downloadRingkasanPDF(
   if (!items.length) return;
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-
   const pw = 210, ph = 297, ml = 10, mr = 10, cw = pw - ml - mr;
 
-  const hex2rgb = (hex: string): [number, number, number] => [
-    parseInt(hex.slice(1, 3), 16),
-    parseInt(hex.slice(3, 5), 16),
-    parseInt(hex.slice(5, 7), 16),
+  const h2r = (hex: string): [number, number, number] => [
+    parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16),
   ];
 
   const logoDataUrl = await loadImageDataUrl("/bps-logo.jpg");
 
-  // ── Header ─────────────────────────────────────────────────
-  if (logoDataUrl) pdf.addImage(logoDataUrl, "JPEG", ml, 5, 18, 18);
+  // ── Header band (biru gelap) ────────────────────────────────
+  pdf.setFillColor(0, 40, 120);
+  pdf.rect(0, 0, pw, 28, "F");
+  // Aksen oranye kanan
+  pdf.setFillColor(234, 88, 12);
+  pdf.rect(pw - 4, 0, 4, 28, "F");
+  // Logo BPS
+  if (logoDataUrl) pdf.addImage(logoDataUrl, "JPEG", ml, 4, 20, 20);
+  // Teks BPS (putih)
+  pdf.setTextColor(255, 255, 255);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8.5);
-  pdf.setTextColor(0, 82, 165);
-  pdf.text("BADAN PUSAT STATISTIK", ml + 21, 11);
-  pdf.setFontSize(8);
-  pdf.text("KABUPATEN TOLI-TOLI", ml + 21, 17);
-  pdf.setDrawColor(0, 82, 165);
-  pdf.setLineWidth(0.6);
-  pdf.line(ml, 25, pw - mr, 25);
-  pdf.setLineWidth(0.15);
-  pdf.setDrawColor(200, 200, 200);
-  pdf.line(ml, 26, pw - mr, 26);
+  pdf.text("BADAN PUSAT STATISTIK", ml + 23, 12);
+  pdf.setFontSize(7.5);
+  pdf.setFont("helvetica", "normal");
+  pdf.text("KABUPATEN TOLI-TOLI", ml + 23, 19);
 
   // ── Judul ──────────────────────────────────────────────────
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(17);
+  pdf.setFontSize(18);
   pdf.setTextColor(234, 88, 12);
-  pdf.text("RINGKASAN INDIKATOR STRATEGIS", pw / 2, 35, { align: "center" });
+  pdf.text("RINGKASAN INDIKATOR STRATEGIS", pw / 2, 38, { align: "center" });
   pdf.setFontSize(11);
-  pdf.setTextColor(0, 82, 165);
-  pdf.text("KABUPATEN TOLI-TOLI", pw / 2, 42, { align: "center" });
+  pdf.setTextColor(0, 40, 120);
+  pdf.text("KABUPATEN TOLI-TOLI", pw / 2, 45, { align: "center" });
+  // Garis dekoratif oranye
+  pdf.setDrawColor(234, 88, 12);
+  pdf.setLineWidth(0.8);
+  pdf.line(pw / 2 - 38, 48, pw / 2 + 38, 48);
 
   // ── Footer ─────────────────────────────────────────────────
   const drawFooter = () => {
     const fy = ph - 20;
-    pdf.setFillColor(255, 247, 237);
-    pdf.setDrawColor(253, 186, 116);
-    pdf.setLineWidth(0.3);
-    pdf.roundedRect(ml, fy, cw, 12, 2, 2, "FD");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(154, 52, 18);
-    pdf.text("Informasi lebih lanjut kunjungi:", ml + 4, fy + 5);
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(7);
-    pdf.setTextColor(29, 111, 202);
-    pdf.text("https://strategis7206.zeabur.app/", ml + 4, fy + 10);
-    pdf.text("https://tolitolikab.bps.go.id/id", pw / 2 + 4, fy + 10);
-    const dy = ph - 5;
+    // Background oranye muda
+    pdf.setFillColor(255, 237, 213);
+    pdf.setDrawColor(251, 146, 60);
+    pdf.setLineWidth(0.4);
+    pdf.roundedRect(ml, fy, cw, 13, 2, 2, "FD");
+    // Aksen oranye kiri
+    pdf.setFillColor(234, 88, 12);
+    pdf.roundedRect(ml, fy, 3, 13, 1, 1, "F");
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(7.5); pdf.setTextColor(154, 52, 18);
+    pdf.text("Informasi lebih lanjut kunjungi:", ml + 6, fy + 5.5);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(7); pdf.setTextColor(29, 78, 180);
+    pdf.text("https://strategis7206.zeabur.app/", ml + 6, fy + 10.5);
+    pdf.text("https://tolitolikab.bps.go.id/id", pw / 2 + 4, fy + 10.5);
+    // Titik warna + website
+    const dy = ph - 4;
     ([
-      [0, 82, 165], [234, 88, 12], [5, 150, 105],
-    ] as [number, number, number][]).forEach(([r, g, b], i) => {
-      pdf.setFillColor(r, g, b); pdf.circle(ml + i * 6, dy, 1.8, "F");
+      [0, 40, 120], [234, 88, 12], [5, 150, 105],
+    ] as [number,number,number][]).forEach(([r, g, b], i) => {
+      pdf.setFillColor(r, g, b);
+      pdf.circle(ml + i * 6, dy, 1.8, "F");
     });
-    pdf.setFont("helvetica", "bold"); pdf.setFontSize(8); pdf.setTextColor(80, 80, 80);
-    pdf.text("tolitolikab.bps.go.id", pw - mr, dy + 1, { align: "right" });
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(8.5); pdf.setTextColor(50, 50, 50);
+    pdf.text("tolitolikab.bps.go.id", pw - mr, dy + 1.2, { align: "right" });
   };
 
   // ── Layout ─────────────────────────────────────────────────
   const grouped = buildGrouped(items, bulan, tahun);
-  const cardsStart = 46, footerTop = ph - 22;
-  const labelH = 8, gapAfterLabel = 2, interGroupGap = 4, gapX = 4, gapY = 2;
-  const cardH = computeCardH(grouped, footerTop - cardsStart, labelH, gapAfterLabel, interGroupGap, gapY);
-  const hdrH = Math.min(8, cardH * 0.38);
-  const valueFsz = cardH >= 24 ? 13 : cardH >= 20 ? 11 : 9;
-  const changeFsz = cardH >= 20 ? 6.5 : 6;
+  const cardsStart = 52, footerTop = ph - 23;
+  const labelH = 9, gapAfterLabel = 3, interGroupGap = 6, gapX = 5, gapY = 3;
+  const cardHmm = computeCardH(grouped, footerTop - cardsStart, labelH, gapAfterLabel, interGroupGap, gapY);
   const cardW = (cw - gapX) / 2;
+  const hdrH = Math.min(12, cardHmm * 0.42);
+
+  // Font sizes berdasarkan tinggi kartu
+  const titleFsz = 6.5;
+  const valueFsz = cardHmm >= 34 ? 16 : cardHmm >= 26 ? 13 : cardHmm >= 20 ? 10 : 8;
+  const satuanFsz = 6;
+  const changeFsz = cardHmm >= 24 ? 7.5 : 6.5;
 
   const drawCard = (item: IndikatorBulanan, x: number, y: number) => {
     const wc = WARNA_MAP[item.warna] ?? WARNA_MAP.biru;
-    const [bgR, bgG, bgB] = hex2rgb(wc.bg);
-    const [sfR, sfG, sfB] = hex2rgb(wc.soft);
-    const [brR, brG, brB] = hex2rgb(wc.border);
-    pdf.setFillColor(sfR, sfG, sfB); pdf.setDrawColor(brR, brG, brB);
-    pdf.setLineWidth(0.25); pdf.roundedRect(x, y, cardW, cardH, 2, 2, "FD");
+    const [bgR,bgG,bgB] = h2r(wc.bg);
+    const [sfR,sfG,sfB] = h2r(wc.soft);
+    const [brR,brG,brB] = h2r(wc.border);
+
+    // Bayangan (fake: kotak abu offset)
+    pdf.setFillColor(210, 215, 225);
+    pdf.roundedRect(x + 0.5, y + 0.5, cardW, cardHmm, 2.5, 2.5, "F");
+
+    // Shell kartu (background lembut)
+    pdf.setFillColor(sfR, sfG, sfB);
+    pdf.setDrawColor(brR, brG, brB);
+    pdf.setLineWidth(0.3);
+    pdf.roundedRect(x, y, cardW, cardHmm, 2.5, 2.5, "FD");
+
+    // Header berwarna (atas rounded, bawah kotak)
     pdf.setFillColor(bgR, bgG, bgB);
-    pdf.roundedRect(x, y, cardW, hdrH, 2, 2, "F");
-    pdf.rect(x, y + hdrH - 2, cardW, 2, "F");
-    pdf.setFont("helvetica", "bold"); pdf.setFontSize(6); pdf.setTextColor(255, 255, 255);
-    pdf.text(pdf.splitTextToSize(item.judul.toUpperCase(), cardW - 4)[0], x + 2, y + hdrH * 0.72);
-    const bodyTop = y + hdrH, bodyH = cardH - hdrH;
-    const valueY = bodyTop + bodyH * 0.58;
-    pdf.setFont("helvetica", "bold"); pdf.setFontSize(valueFsz); pdf.setTextColor(12, 35, 64);
-    pdf.text(item.nilai, x + 2.5, valueY);
+    pdf.roundedRect(x, y, cardW, hdrH, 2.5, 2.5, "F");
+    pdf.rect(x, y + 2, cardW, hdrH - 2, "F"); // tutup sudut bawah header
+
+    // Garis tipis pemisah header-body
+    pdf.setDrawColor(255, 255, 255);
+    pdf.setLineWidth(0.15);
+    pdf.line(x, y + hdrH, x + cardW, y + hdrH);
+
+    // Judul di header
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(titleFsz);
+    const titleLine = pdf.splitTextToSize(item.judul.toUpperCase(), cardW - 5)[0];
+    pdf.text(titleLine, x + 2.5, y + hdrH * 0.68);
+
+    // Body
+    const bodyTop = y + hdrH, bodyH = cardHmm - hdrH;
+    const valY = bodyTop + bodyH * 0.56;
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(valueFsz); pdf.setTextColor(10, 30, 80);
+    pdf.text(item.nilai, x + 3, valY);
+
     if (item.satuan) {
-      pdf.setFont("helvetica", "normal"); pdf.setFontSize(5.5); pdf.setTextColor(100, 100, 100);
-      pdf.text(item.satuan, x + 2.5 + pdf.getTextWidth(item.nilai) + 0.8, valueY);
+      pdf.setFont("helvetica", "normal"); pdf.setFontSize(satuanFsz); pdf.setTextColor(120, 120, 120);
+      pdf.text(item.satuan, x + 3 + pdf.getTextWidth(item.nilai) + 1, valY - 0.5);
     }
-    const changeY = bodyTop + bodyH * 0.88;
+
+    const chY = bodyTop + bodyH * 0.87;
     if (item.perubahan) {
       const naik = item.arahPerubahan === "naik", turun = item.arahPerubahan === "turun";
+      const [cr,cg,cb] = naik ? [5,120,90] : turun ? [200,30,30] : [100,100,100];
+      // Segitiga arah
+      const tx = x + 3, ty = chY - 1.8;
+      pdf.setFillColor(cr, cg, cb);
+      if (naik) {
+        pdf.triangle(tx, ty + 2.5, tx + 1.5, ty, tx + 3, ty + 2.5, "F");
+      } else if (turun) {
+        pdf.triangle(tx, ty, tx + 1.5, ty + 2.5, tx + 3, ty, "F");
+      }
       pdf.setFont("helvetica", "bold"); pdf.setFontSize(changeFsz);
-      pdf.setTextColor(naik ? 5 : turun ? 220 : 100, naik ? 150 : turun ? 38 : 100, naik ? 105 : turun ? 38 : 100);
-      pdf.text(item.perubahan, x + 2.5, changeY);
+      pdf.setTextColor(cr, cg, cb);
+      pdf.text(item.perubahan, x + 7.5, chY);
     } else {
       const note = (item.keterangan ?? item.periode ?? "").trim();
-      if (note) { pdf.setFont("helvetica", "normal"); pdf.setFontSize(5.5); pdf.setTextColor(100, 100, 100); pdf.text(pdf.splitTextToSize(note, cardW - 5)[0], x + 2.5, changeY); }
+      if (note) {
+        pdf.setFont("helvetica", "normal"); pdf.setFontSize(5.5); pdf.setTextColor(110, 110, 110);
+        pdf.text(pdf.splitTextToSize(note, cardW - 6)[0], x + 3, chY);
+      }
     }
   };
 
   let y = cardsStart;
   for (let gi = 0; gi < grouped.length; gi++) {
     const [periode, cards] = grouped[gi];
+    // Label periode — dengan aksen kiri berwarna
     pdf.setFillColor(254, 243, 199); pdf.setDrawColor(251, 191, 36);
-    pdf.setLineWidth(0.25); pdf.roundedRect(ml, y, cw, labelH, 1.5, 1.5, "FD");
-    pdf.setFont("helvetica", "bold"); pdf.setFontSize(7.5); pdf.setTextColor(92, 60, 0);
-    pdf.text(periode, ml + 3.5, y + labelH * 0.7);
+    pdf.setLineWidth(0.3); pdf.roundedRect(ml, y, cw, labelH, 2, 2, "FD");
+    pdf.setFillColor(217, 119, 6); pdf.roundedRect(ml, y, 3, labelH, 1, 1, "F");
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(8); pdf.setTextColor(92, 60, 0);
+    pdf.text(periode, ml + 5.5, y + labelH * 0.69);
     y += labelH + gapAfterLabel;
+
     let col = 0;
     for (const item of cards) {
-      if (col === 2) { col = 0; y += cardH + gapY; }
+      if (col === 2) { col = 0; y += cardHmm + gapY; }
       drawCard(item, ml + col * (cardW + gapX), y); col++;
     }
-    y += cardH + (gi < grouped.length - 1 ? interGroupGap : 0);
+    y += cardHmm + (gi < grouped.length - 1 ? interGroupGap : 0);
   }
 
   drawFooter();
   pdf.save(`Ringkasan-Indikator-Strategis-${BULAN_LABEL[bulan]}-${tahun}.pdf`);
 }
 
-// ── PNG Download (Canvas 2D) ──────────────────────────────────────────────────
+// ── PNG Download (Canvas 2D — Infografis) ────────────────────────────────────
 
 async function downloadRingkasanPNG(
   items: IndikatorBulanan[],
@@ -226,21 +273,17 @@ async function downloadRingkasanPNG(
 ) {
   if (!items.length) return;
 
-  // A4 portrait at 150dpi: 1mm = 150/25.4 ≈ 5.906px
-  const DPI = 150;
-  const MM  = DPI / 25.4;
-  const CW  = Math.round(210 * MM);   // 1240px
-  const CH  = Math.round(297 * MM);   // 1754px
+  const DPI = 150, MM = DPI / 25.4;
+  const p = (mm: number) => mm * MM;
+  const pt = (sz: number) => Math.round(sz * DPI / 72);
+  const CW = Math.round(p(210)), CH = Math.round(p(297));
 
   const canvas = document.createElement("canvas");
-  canvas.width  = CW;
-  canvas.height = CH;
+  canvas.width = CW; canvas.height = CH;
   const ctx = canvas.getContext("2d")!;
 
-  const p = (mm: number) => mm * MM;
-
-  // helper: rounded rect path
-  const rr = (x: number, y: number, w: number, h: number, r: number) => {
+  // ── Helpers ─────────────────────────────────────────────
+  const rrPath = (x: number, y: number, w: number, h: number, r: number) => {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
     ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -250,171 +293,251 @@ async function downloadRingkasanPNG(
     ctx.closePath();
   };
 
-  // pt → px at DPI
-  const pt = (size: number) => size * DPI / 72;
-
-  // text wrap helper
-  const wrapText = (text: string, maxW: number): string[] => {
-    const words = text.split(" ");
-    const lines: string[] = [];
-    let line = "";
-    for (const w of words) {
-      const test = line ? line + " " + w : w;
-      if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
-      else line = test;
-    }
-    if (line) lines.push(line);
-    return lines;
+  // Rounded rect dengan rounded corners hanya di atas
+  const topRRPath = (x: number, y: number, w: number, h: number, r: number) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
   };
 
-  // white background
-  ctx.fillStyle = "#ffffff";
+  const setShadow = (blur: number, color: string, oy = 0) => {
+    ctx.shadowBlur = blur; ctx.shadowColor = color; ctx.shadowOffsetY = oy; ctx.shadowOffsetX = 0;
+  };
+  const clearShadow = () => setShadow(0, "transparent");
+
+  const wrapLine = (text: string, maxW: number): string => {
+    const words = text.split(" ");
+    let line = "";
+    for (const w of words) {
+      const t = line ? line + " " + w : w;
+      if (ctx.measureText(t).width > maxW && line) break;
+      line = t;
+    }
+    return line || text;
+  };
+
+  // ── Latar halaman ──────────────────────────────────────
+  ctx.fillStyle = "#EEF2F8";
   ctx.fillRect(0, 0, CW, CH);
+  // Panel putih (isi halaman)
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(p(5), 0, CW - p(10), CH);
 
-  const ml = p(10), mr = p(10), cw = CW - ml - mr;
+  const PAD = p(12), cw = CW - PAD * 2;
 
-  // ── Load logo BPS ─────────────────────────────────────────
+  // ── Load logo ─────────────────────────────────────────
   let logoImg: HTMLImageElement | null = null;
   try {
     logoImg = await new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
+      img.onload = () => resolve(img); img.onerror = reject;
       img.src = "/bps-logo.jpg";
     });
-  } catch { /* no logo */ }
+  } catch { /* fallback */ }
 
-  // ── Header ────────────────────────────────────────────────
-  if (logoImg) ctx.drawImage(logoImg, ml, p(5), p(18), p(18));
-  ctx.fillStyle = "#0052A5";
-  ctx.font = `bold ${pt(8.5)}px Arial`;
-  ctx.fillText("BADAN PUSAT STATISTIK", ml + p(21), p(11));
-  ctx.font = `bold ${pt(8)}px Arial`;
-  ctx.fillText("KABUPATEN TOLI-TOLI", ml + p(21), p(17));
-  ctx.strokeStyle = "#0052A5"; ctx.lineWidth = p(0.6);
-  ctx.beginPath(); ctx.moveTo(ml, p(25)); ctx.lineTo(CW - mr, p(25)); ctx.stroke();
-  ctx.strokeStyle = "#C8C8C8"; ctx.lineWidth = p(0.15);
-  ctx.beginPath(); ctx.moveTo(ml, p(26)); ctx.lineTo(CW - mr, p(26)); ctx.stroke();
+  // ── Header band biru ──────────────────────────────────
+  const BAND_H = p(30);
+  const grad = ctx.createLinearGradient(0, 0, CW, 0);
+  grad.addColorStop(0, "#002888"); grad.addColorStop(1, "#0052A5");
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, CW, BAND_H);
+  // Aksen oranye kanan
+  ctx.fillStyle = "#EA580C"; ctx.fillRect(CW - p(5), 0, p(5), BAND_H);
+  // Aksen putih tipis bawah
+  ctx.fillStyle = "rgba(255,255,255,0.15)"; ctx.fillRect(0, BAND_H - p(0.5), CW, p(0.5));
 
-  // ── Judul ─────────────────────────────────────────────────
+  // Logo
+  const LOGO = p(22);
+  if (logoImg) {
+    // Lingkaran putih di belakang logo
+    ctx.beginPath(); ctx.arc(PAD + LOGO/2, BAND_H/2, LOGO/2 + p(1.5), 0, Math.PI*2);
+    ctx.fillStyle = "rgba(255,255,255,0.18)"; ctx.fill();
+    ctx.drawImage(logoImg, PAD, (BAND_H - LOGO) / 2, LOGO, LOGO);
+  }
+  // Teks BPS
+  ctx.fillStyle = "#FFFFFF"; ctx.textBaseline = "middle";
+  ctx.font = `bold ${pt(9)}px Arial, sans-serif`;
+  ctx.fillText("BADAN PUSAT STATISTIK", PAD + LOGO + p(4), BAND_H * 0.35);
+  ctx.font = `${pt(8)}px Arial, sans-serif`;
+  ctx.fillStyle = "rgba(255,255,255,0.82)";
+  ctx.fillText("KABUPATEN TOLI-TOLI", PAD + LOGO + p(4), BAND_H * 0.68);
+  ctx.textBaseline = "alphabetic";
+
+  // ── Judul ─────────────────────────────────────────────
+  const TITLE_TOP = BAND_H + p(6);
   ctx.textAlign = "center";
-  ctx.font = `bold ${pt(17)}px Arial`;
+  ctx.font = `bold ${pt(20)}px Arial, sans-serif`;
   ctx.fillStyle = "#EA580C";
-  ctx.fillText("RINGKASAN INDIKATOR STRATEGIS", CW / 2, p(35));
-  ctx.font = `bold ${pt(11)}px Arial`;
-  ctx.fillStyle = "#0052A5";
-  ctx.fillText("KABUPATEN TOLI-TOLI", CW / 2, p(42));
+  ctx.fillText("RINGKASAN INDIKATOR STRATEGIS", CW / 2, TITLE_TOP + pt(20));
+  ctx.font = `bold ${pt(12)}px Arial, sans-serif`;
+  ctx.fillStyle = "#00287A";
+  ctx.fillText("KABUPATEN TOLI-TOLI", CW / 2, TITLE_TOP + pt(20) + pt(14));
+  // Garis dekoratif
+  const SEP_Y = TITLE_TOP + pt(20) + pt(14) + p(5);
+  ctx.strokeStyle = "#EA580C"; ctx.lineWidth = p(0.8);
+  ctx.beginPath(); ctx.moveTo(CW/2 - p(45), SEP_Y); ctx.lineTo(CW/2 + p(45), SEP_Y); ctx.stroke();
   ctx.textAlign = "left";
 
-  // ── Layout calculation ────────────────────────────────────
-  const grouped = buildGrouped(items, bulan, tahun);
-  const cardsStart = p(46), footerTop = p(297 - 22);
-  const labelH = p(8), gapAfterLabel = p(2), interGroupGap = p(4);
-  const gapX = p(4), gapY = p(2);
-  const cardHmm = computeCardH(
-    grouped, 297 - 22 - 46, 8, 2, 4, 2,
-  );
-  const cardH = p(cardHmm);
-  const hdrH  = Math.min(p(8), cardH * 0.38);
-  const valueFsz = cardHmm >= 24 ? pt(13) : cardHmm >= 20 ? pt(11) : pt(9);
-  const changeFsz = cardHmm >= 20 ? pt(6.5) : pt(6);
-  const cardW = (cw - gapX) / 2;
+  const CARDS_START = SEP_Y + p(8);
 
-  // ── Draw card ─────────────────────────────────────────────
+  // ── Layout calculation ─────────────────────────────────
+  const grouped = buildGrouped(items, bulan, tahun);
+  const LABEL_H  = p(9),  GAP_AL  = p(3), IG_GAP = p(6);
+  const GAP_X    = p(5),  GAP_Y   = p(3);
+  const FOOTER_TOP = p(274);
+
+  const cardHmm = computeCardH(grouped, (FOOTER_TOP - CARDS_START) / MM, 9, 3, 6, 3);
+  const CARD_H  = p(cardHmm);
+  const CARD_W  = (cw - GAP_X) / 2;
+  const HDR_H   = Math.min(p(13), CARD_H * 0.42);
+  const R       = p(3.5);
+
+  const valueFsz = cardHmm >= 34 ? pt(17) : cardHmm >= 26 ? pt(14) : cardHmm >= 20 ? pt(11) : pt(9);
+  const changeFsz = cardHmm >= 26 ? pt(8.5) : pt(7);
+  const titleFsz  = pt(7);
+
+  // ── Draw card ──────────────────────────────────────────
   const drawCard = (item: IndikatorBulanan, x: number, y: number) => {
     const wc = WARNA_MAP[item.warna] ?? WARNA_MAP.biru;
 
-    // Shell
-    rr(x, y, cardW, cardH, p(2));
-    ctx.fillStyle = wc.soft; ctx.fill();
-    ctx.strokeStyle = wc.border; ctx.lineWidth = p(0.25); ctx.stroke();
+    // Shadow
+    setShadow(p(3.5), "rgba(0,0,0,0.14)", p(2));
+    rrPath(x, y, CARD_W, CARD_H, R);
+    ctx.fillStyle = "#FFFFFF"; ctx.fill();
+    clearShadow();
 
-    // Colored header
-    rr(x, y, cardW, hdrH, p(2));
+    // Soft border
+    rrPath(x, y, CARD_W, CARD_H, R);
+    ctx.strokeStyle = wc.border; ctx.lineWidth = p(0.3); ctx.stroke();
+
+    // Header berwarna (atas rounded, bawah datar)
+    topRRPath(x, y, CARD_W, HDR_H, R);
     ctx.fillStyle = wc.bg; ctx.fill();
-    ctx.fillRect(x, y + hdrH - p(2), cardW, p(2));
 
-    // Title in header
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `bold ${pt(6)}px Arial`;
-    const titleLine = wrapText(item.judul.toUpperCase(), cardW - p(4))[0] ?? item.judul;
-    ctx.fillText(titleLine, x + p(2), y + hdrH * 0.72);
+    // Shimmer putih tipis di header
+    const shimmer = ctx.createLinearGradient(x, y, x, y + HDR_H);
+    shimmer.addColorStop(0, "rgba(255,255,255,0.18)");
+    shimmer.addColorStop(1, "rgba(255,255,255,0.0)");
+    topRRPath(x, y, CARD_W, HDR_H, R);
+    ctx.fillStyle = shimmer; ctx.fill();
 
-    // Value
-    const bodyTop = y + hdrH, bodyH = cardH - hdrH;
-    const valY = bodyTop + bodyH * 0.58;
-    ctx.font = `bold ${valueFsz}px Arial`;
-    ctx.fillStyle = "#0C2340";
-    ctx.fillText(item.nilai, x + p(2.5), valY);
+    // Judul di header
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = `bold ${titleFsz}px Arial, sans-serif`;
+    ctx.fillText(wrapLine(item.judul.toUpperCase(), CARD_W - p(5)), x + p(3), y + HDR_H * 0.67);
 
-    // Satuan
+    // Body content
+    const bodyTop = y + HDR_H, bodyH = CARD_H - HDR_H;
+    const valY    = bodyTop + bodyH * 0.54;
+
+    ctx.font     = `bold ${valueFsz}px Arial, sans-serif`;
+    ctx.fillStyle = "#0A1E50";
+    ctx.fillText(item.nilai, x + p(3), valY);
+
     if (item.satuan) {
       const vw = ctx.measureText(item.nilai).width;
-      ctx.font = `${pt(5.5)}px Arial`;
-      ctx.fillStyle = "#646464";
-      ctx.fillText(item.satuan, x + p(2.5) + vw + p(0.8), valY);
+      ctx.font = `${pt(6.5)}px Arial, sans-serif`;
+      ctx.fillStyle = "#888";
+      ctx.textBaseline = "bottom";
+      ctx.fillText(item.satuan, x + p(3) + vw + p(1), valY);
+      ctx.textBaseline = "alphabetic";
     }
 
-    // Perubahan / keterangan
-    const chY = bodyTop + bodyH * 0.88;
+    const chY = bodyTop + bodyH * 0.86;
     if (item.perubahan) {
-      const naik = item.arahPerubahan === "naik", turun = item.arahPerubahan === "turun";
-      ctx.font = `bold ${changeFsz}px Arial`;
-      ctx.fillStyle = naik ? "#059669" : turun ? "#DC2626" : "#646464";
-      ctx.fillText(item.perubahan, x + p(2.5), chY);
+      const naik  = item.arahPerubahan === "naik";
+      const turun = item.arahPerubahan === "turun";
+      const color = naik ? "#059669" : turun ? "#DC2626" : "#6B7280";
+      // Segitiga panah
+      const TRI = pt(changeFsz / pt(1)) * 0.38;
+      const tx = x + p(3) + TRI, ty = chY - TRI * 0.6;
+      ctx.beginPath();
+      if (naik) {
+        ctx.moveTo(tx, ty - TRI); ctx.lineTo(tx + TRI, ty + TRI * 0.65); ctx.lineTo(tx - TRI, ty + TRI * 0.65);
+      } else if (turun) {
+        ctx.moveTo(tx, ty + TRI); ctx.lineTo(tx + TRI, ty - TRI * 0.65); ctx.lineTo(tx - TRI, ty - TRI * 0.65);
+      }
+      ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+
+      ctx.font = `bold ${changeFsz}px Arial, sans-serif`;
+      ctx.fillStyle = color;
+      ctx.fillText(item.perubahan, x + p(3) + TRI * 2.4, chY);
     } else {
       const note = (item.keterangan ?? item.periode ?? "").trim();
       if (note) {
-        ctx.font = `${pt(5.5)}px Arial`;
-        ctx.fillStyle = "#646464";
-        ctx.fillText(wrapText(note, cardW - p(5))[0] ?? note, x + p(2.5), chY);
+        ctx.font = `${pt(6)}px Arial, sans-serif`; ctx.fillStyle = "#888";
+        ctx.fillText(wrapLine(note, CARD_W - p(6)), x + p(3), chY);
       }
     }
   };
 
-  // ── Render groups & cards ─────────────────────────────────
-  let y = cardsStart;
+  // ── Render groups ──────────────────────────────────────
+  let y = CARDS_START;
   for (let gi = 0; gi < grouped.length; gi++) {
     const [periode, cards] = grouped[gi];
 
-    // Period label (yellow)
-    rr(ml, y, cw, labelH, p(1.5));
+    // Label periode (kuning dengan shadow)
+    setShadow(p(2), "rgba(0,0,0,0.10)", p(1));
+    rrPath(PAD, y, cw, LABEL_H, p(2.5));
     ctx.fillStyle = "#FEF3C7"; ctx.fill();
-    ctx.strokeStyle = "#FBBF24"; ctx.lineWidth = p(0.25); ctx.stroke();
-    ctx.font = `bold ${pt(7.5)}px Arial`;
-    ctx.fillStyle = "#5C3C00";
-    ctx.fillText(periode, ml + p(3.5), y + labelH * 0.7);
-    y += labelH + gapAfterLabel;
+    clearShadow();
+    rrPath(PAD, y, cw, LABEL_H, p(2.5));
+    ctx.strokeStyle = "#F59E0B"; ctx.lineWidth = p(0.3); ctx.stroke();
+    // Aksen kiri kuning-tua
+    ctx.fillStyle = "#D97706";
+    ctx.fillRect(PAD, y + p(1.5), p(3), LABEL_H - p(3));
+    ctx.beginPath(); ctx.arc(PAD + p(1.5), y + p(1.5), p(1.5), 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(PAD + p(1.5), y + LABEL_H - p(1.5), p(1.5), 0, Math.PI*2); ctx.fill();
+
+    ctx.font = `bold ${pt(8)}px Arial, sans-serif`;
+    ctx.fillStyle = "#78350F";
+    ctx.fillText(periode, PAD + p(6), y + LABEL_H * 0.69);
+    y += LABEL_H + GAP_AL;
 
     let col = 0;
     for (const item of cards) {
-      if (col === 2) { col = 0; y += cardH + gapY; }
-      drawCard(item, ml + col * (cardW + gapX), y); col++;
+      if (col === 2) { col = 0; y += CARD_H + GAP_Y; }
+      drawCard(item, PAD + col * (CARD_W + GAP_X), y); col++;
     }
-    y += cardH + (gi < grouped.length - 1 ? interGroupGap : 0);
+    y += CARD_H + (gi < grouped.length - 1 ? IG_GAP : 0);
   }
 
-  // ── Footer ────────────────────────────────────────────────
-  const fy = p(297 - 20);
-  rr(ml, fy, cw, p(12), p(2));
-  ctx.fillStyle = "#FFF7ED"; ctx.fill();
-  ctx.strokeStyle = "#FDBA74"; ctx.lineWidth = p(0.3); ctx.stroke();
-  ctx.font = `bold ${pt(7.5)}px Arial`; ctx.fillStyle = "#9A3412";
-  ctx.fillText("Informasi lebih lanjut kunjungi:", ml + p(4), fy + p(5));
-  ctx.font = `${pt(7)}px Arial`; ctx.fillStyle = "#1D6FCA";
-  ctx.fillText("https://strategis7206.zeabur.app/", ml + p(4), fy + p(10));
-  ctx.fillText("https://tolitolikab.bps.go.id/id", CW / 2 + p(4), fy + p(10));
+  // ── Footer ────────────────────────────────────────────
+  const FY = p(275), FH = p(15);
+  // Footer box oranye
+  setShadow(p(3), "rgba(0,0,0,0.10)", -p(1));
+  rrPath(PAD, FY, cw, FH, p(3));
+  const fgrad = ctx.createLinearGradient(PAD, FY, PAD + cw, FY);
+  fgrad.addColorStop(0, "#FFEDD5"); fgrad.addColorStop(1, "#FEF3C7");
+  ctx.fillStyle = fgrad; ctx.fill();
+  clearShadow();
+  rrPath(PAD, FY, cw, FH, p(3));
+  ctx.strokeStyle = "#FB923C"; ctx.lineWidth = p(0.4); ctx.stroke();
+  // Aksen kiri
+  ctx.fillStyle = "#EA580C"; ctx.fillRect(PAD, FY + p(2), p(3.5), FH - p(4));
 
-  const dy = p(297 - 5);
-  [[0, 82, 165], [234, 88, 12], [5, 150, 105]].forEach(([r, g, b], i) => {
-    ctx.beginPath(); ctx.arc(ml + p(i * 6), dy, p(1.8), 0, Math.PI * 2);
+  ctx.font = `bold ${pt(8)}px Arial, sans-serif`; ctx.fillStyle = "#9A3412";
+  ctx.fillText("Informasi lebih lanjut kunjungi:", PAD + p(7), FY + FH * 0.40);
+  ctx.font = `${pt(7.5)}px Arial, sans-serif`; ctx.fillStyle = "#1D4ED8";
+  ctx.fillText("https://strategis7206.zeabur.app/", PAD + p(7), FY + FH * 0.78);
+  ctx.fillText("https://tolitolikab.bps.go.id/id", PAD + cw/2 + p(3), FY + FH * 0.78);
+
+  // Titik warna + nama website
+  const DY = p(294);
+  [[0,40,120],[234,88,12],[5,150,105]].forEach(([r,g,b],i) => {
+    ctx.beginPath(); ctx.arc(PAD + p(i * 7 + 2), DY, p(2.2), 0, Math.PI * 2);
     ctx.fillStyle = `rgb(${r},${g},${b})`; ctx.fill();
   });
-  ctx.textAlign = "right"; ctx.font = `bold ${pt(8)}px Arial`; ctx.fillStyle = "#505050";
-  ctx.fillText("tolitolikab.bps.go.id", CW - mr, dy + p(1));
+  ctx.textAlign = "right"; ctx.font = `bold ${pt(9)}px Arial, sans-serif`; ctx.fillStyle = "#1F2937";
+  ctx.fillText("tolitolikab.bps.go.id", CW - PAD, DY + p(2));
   ctx.textAlign = "left";
 
-  // ── Export PNG ────────────────────────────────────────────
+  // ── Ekspor PNG ────────────────────────────────────────
   canvas.toBlob((blob) => {
     if (!blob) return;
     const a = document.createElement("a");
