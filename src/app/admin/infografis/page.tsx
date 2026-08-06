@@ -2,7 +2,7 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useEffect, useState, useRef } from "react";
 import { infografisApi } from "@/lib/api";
-import { Upload, Trash2, Loader2, X, CheckCircle } from "lucide-react";
+import { Upload, Trash2, Loader2, X, CheckCircle, AlertCircle } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http://localhost:3001";
 
@@ -19,6 +19,7 @@ export default function AdminInfografisPage() {
   const [items, setItems] = useState<Infografis[]>([]);
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({ judul: "", deskripsi: "", urutan: "0" });
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -41,6 +42,7 @@ export default function AdminInfografisPage() {
     fd.append("judul", form.judul);
     if (form.deskripsi) fd.append("deskripsi", form.deskripsi);
     fd.append("urutan", form.urutan);
+    setError("");
     try {
       await infografisApi.create(fd);
       setSuccess(true);
@@ -50,7 +52,10 @@ export default function AdminInfografisPage() {
       if (fileRef.current) fileRef.current.value = "";
       load();
       setTimeout(() => setSuccess(false), 2500);
-    } catch {}
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Gagal upload. Pastikan sesi login masih aktif dan coba lagi.";
+      setError(typeof msg === "string" ? msg : JSON.stringify(msg));
+    }
     setUploading(false);
   };
 
@@ -61,6 +66,8 @@ export default function AdminInfografisPage() {
   };
 
   const handleToggle = async (item: Infografis) => {
+    const aksi = item.aktif ? "nonaktifkan" : "aktifkan";
+    if (!confirm(`${aksi.charAt(0).toUpperCase() + aksi.slice(1)} infografis "${item.judul}"?`)) return;
     await infografisApi.update(item.id, { aktif: !item.aktif });
     load();
   };
@@ -133,18 +140,27 @@ export default function AdminInfografisPage() {
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={uploading || !file || !form.judul}
-              className="flex items-center gap-2 bg-[#1D6FCA] text-white px-5 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50"
-            >
-              {uploading
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> Mengupload...</>
-                : success
-                ? <><CheckCircle className="w-4 h-4" /> Berhasil!</>
-                : <><Upload className="w-4 h-4" /> Upload Infografis</>
-              }
-            </button>
+            <div className="flex items-center gap-3 flex-wrap">
+              <button
+                type="submit"
+                disabled={uploading || !file || !form.judul}
+                className="flex items-center gap-2 bg-[#1D6FCA] text-white px-5 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50"
+              >
+                {uploading
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Mengupload...</>
+                  : success
+                  ? <><CheckCircle className="w-4 h-4" /> Berhasil!</>
+                  : <><Upload className="w-4 h-4" /> Upload Infografis</>
+                }
+              </button>
+              {error && (
+                <div className="flex items-center gap-1.5 text-red-600 text-xs bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  {error}
+                  <button onClick={() => setError("")} className="ml-1"><X className="w-3 h-3" /></button>
+                </div>
+              )}
+            </div>
           </form>
         </div>
 

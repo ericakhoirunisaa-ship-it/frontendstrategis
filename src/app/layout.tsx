@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import TitleTicker from "@/components/TitleTicker";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-[#F5F8FC] dark:bg-[#0B1120] antialiased" style={{ fontFamily: "var(--font-plus-jakarta), sans-serif" }}>
         <ThemeProvider>
+          <TitleTicker />
           {children}
         </ThemeProvider>
       </body>
