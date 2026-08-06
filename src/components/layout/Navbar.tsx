@@ -65,6 +65,12 @@ export default function Navbar() {
 
             {/* Right side */}
             <div className="hidden md:flex items-center gap-2">
+              <Link
+                href="/admin/login"
+                className="text-xs font-semibold text-slate-400 dark:text-slate-500 hover:text-[#1D6FCA] transition-colors"
+              >
+                Admin
+              </Link>
               {/* Search */}
               <button
                 onClick={() => document.dispatchEvent(new CustomEvent("sitara:open-search"))}
