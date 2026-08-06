@@ -472,7 +472,7 @@ export default function AdminPortalDaerahPage() {
                   <div className="mt-3 overflow-x-auto rounded-lg border border-blue-200">
                     <table className="text-xs w-full">
                       <thead>
-                        <tr className="bg-[#0D6B56] text-white">
+                        <tr className="bg-[#1D6FCA] text-white">
                           {csvData.columns.map((col) => (
                             <th key={col} className="px-3 py-2 text-left whitespace-nowrap font-semibold">{col}</th>
                           ))}

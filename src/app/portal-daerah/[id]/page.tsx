@@ -165,13 +165,13 @@ export default function DatasetDetailPage() {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="flex items-center gap-2 font-bold text-slate-700 dark:text-white text-base">
-          <TableIcon className="w-4 h-4 text-[#0D6B56]" />
+          <TableIcon className="w-4 h-4 text-[#1D6FCA]" />
           Tabel Dataset
         </h2>
         <div className="relative">
           <button
             onClick={() => setDownloadOpen((o) => !o)}
-            className="flex items-center gap-1.5 bg-[#0D6B56] hover:bg-[#0a5a48] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 bg-[#1D6FCA] hover:bg-[#1558a8] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
           >
             <Download className="w-4 h-4" />
             <ChevronDown className="w-3.5 h-3.5" />
@@ -184,7 +184,7 @@ export default function DatasetDetailPage() {
                   onClick={() => { downloadCSV(dataset); setDownloadOpen(false); }}
                   className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
-                  <FileText className="w-4 h-4 text-[#0D6B56]" />
+                  <FileText className="w-4 h-4 text-[#1D6FCA]" />
                   Unduh CSV
                 </button>
               </div>
@@ -195,7 +195,7 @@ export default function DatasetDetailPage() {
       <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-[#0D6B56] text-white">
+            <tr className="bg-[#1D6FCA] text-white">
               {cols.map((col) => (
                 <th key={col} className="px-4 py-3 text-left font-semibold whitespace-nowrap">{col}</th>
               ))}
@@ -261,7 +261,7 @@ export default function DatasetDetailPage() {
                 {dataset.dinas}
               </span>
             </div>
-            <span className="flex items-center gap-1.5 bg-[#E8F5F2] dark:bg-teal-900/30 text-[#0D6B56] dark:text-teal-400 text-sm font-semibold px-3 py-1.5 rounded-lg">
+            <span className="flex items-center gap-1.5 bg-[#EEF5FF] dark:bg-blue-900/30 text-[#1D6FCA] dark:text-blue-400 text-sm font-semibold px-3 py-1.5 rounded-lg">
               <Eye className="w-4 h-4" />
               {(dataset.dilihat + 1).toLocaleString("id-ID")}
             </span>
@@ -289,7 +289,7 @@ export default function DatasetDetailPage() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors -mb-px ${
                   activeTab === tab.key
-                    ? "border-[#0D6B56] text-[#0D6B56] dark:text-teal-400 dark:border-teal-400"
+                    ? "border-[#1D6FCA] text-[#1D6FCA] dark:text-blue-400 dark:border-blue-400"
                     : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 }`}
               >
@@ -306,7 +306,7 @@ export default function DatasetDetailPage() {
             {activeTab === "grafik" && (
               <div>
                 <h2 className="flex items-center gap-2 font-bold text-slate-700 dark:text-white text-base mb-6">
-                  <BarChart2 className="w-4 h-4 text-[#0D6B56]" />
+                  <BarChart2 className="w-4 h-4 text-[#1D6FCA]" />
                   Grafik Dataset
                 </h2>
                 {chartCols.length === 0 ? (
@@ -359,7 +359,7 @@ export default function DatasetDetailPage() {
               <div className="space-y-6">
                 <div>
                   <h2 className="font-bold text-slate-700 dark:text-white text-base mb-3">Deskripsi Dataset</h2>
-                  <p className="text-sm text-[#0D6B56] dark:text-teal-400 bg-[#E8F5F2] dark:bg-teal-900/20 rounded-lg px-4 py-3 leading-relaxed">
+                  <p className="text-sm text-[#1D6FCA] dark:text-blue-400 bg-[#EEF5FF] dark:bg-blue-900/20 rounded-lg px-4 py-3 leading-relaxed">
                     {dataset.deskripsi || `Dataset ini berisi informasi tentang ${dataset.judul}.`}
                   </p>
                 </div>

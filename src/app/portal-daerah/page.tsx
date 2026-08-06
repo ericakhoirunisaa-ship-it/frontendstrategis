@@ -133,7 +133,7 @@ export default function PortalDaerahPage() {
               </div>
               <button
                 onClick={handleCari}
-                className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-[#0D6B56] hover:bg-[#0a5a48] text-white font-semibold text-sm transition-colors shrink-0"
+                className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-[#1D6FCA] hover:bg-[#1558a8] text-white font-semibold text-sm transition-colors shrink-0"
               >
                 <Search className="w-4 h-4" />
                 Cari
@@ -177,7 +177,7 @@ export default function PortalDaerahPage() {
                   const IconComp = ICON_MAP[dataset.icon] ?? Database;
                   return (
                     <Link key={dataset.id} href={`/portal-daerah/${dataset.id}`}>
-                      <div className="bg-[#E8F5F2] dark:bg-[#0D2318] border border-teal-100 dark:border-teal-900/30 rounded-xl p-4 flex gap-4 hover:shadow-md transition-all cursor-pointer group">
+                      <div className="bg-[#EEF5FF] dark:bg-[#0D1A2E] border border-blue-100 dark:border-blue-900/30 rounded-xl p-4 flex gap-4 hover:shadow-md transition-all cursor-pointer group">
                         <div className="flex flex-col items-center justify-between shrink-0 w-[90px]">
                           <div
                             className="w-[80px] h-[80px] rounded-xl flex items-center justify-center shadow-sm"
@@ -188,13 +188,13 @@ export default function PortalDaerahPage() {
                               style={{ color: dataset.iconColor }}
                             />
                           </div>
-                          <span className="mt-2 flex items-center gap-1 border border-[#0D6B56] text-[#0D6B56] dark:border-teal-400 dark:text-teal-400 text-xs font-semibold px-2.5 py-1 rounded">
+                          <span className="mt-2 flex items-center gap-1 border border-[#1D6FCA] text-[#1D6FCA] dark:border-blue-400 dark:text-blue-400 text-xs font-semibold px-2.5 py-1 rounded">
                             <Eye className="w-3 h-3" />
                             {dataset.dilihat.toLocaleString("id-ID")}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-slate-800 dark:text-white text-sm leading-snug group-hover:text-[#0D6B56] dark:group-hover:text-teal-400 transition-colors line-clamp-3 mb-2">
+                          <h3 className="font-bold text-slate-800 dark:text-white text-sm leading-snug group-hover:text-[#1D6FCA] dark:group-hover:text-blue-400 transition-colors line-clamp-3 mb-2">
                             {dataset.judul}
                           </h3>
                           <div className="flex items-start gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-1">
