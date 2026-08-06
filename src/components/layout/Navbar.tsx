@@ -100,10 +100,10 @@ export default function Navbar() {
               {/* Accessibility widget */}
               <AccessibilityWidget />
               <Link
-                href="/layanan-konsultasi"
+                href="/portal-daerah"
                 className="btn-primary text-xs px-4 py-2"
               >
-                Konsultasi Data
+                Portal Daerah
               </Link>
             </div>
 
