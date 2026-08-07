@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Calendar, Map, Database, MessageSquare, ArrowRight } from "lucide-react";
+import { Calendar, Globe, Database, MessageSquare, ArrowRight } from "lucide-react";
 
 const cards = [
   {
@@ -13,11 +13,11 @@ const cards = [
     tagBg: "rgba(255,255,255,0.15)",
   },
   {
-    href: "/peta-tematik",
-    icon: Map,
-    title: "Peta Tematik",
-    desc: "Visualisasi sebaran data statistik per kecamatan pada peta interaktif Kabupaten Toli-Toli.",
-    tag: "Spasial",
+    href: "/portal-daerah",
+    icon: Globe,
+    title: "Portal Daerah",
+    desc: "Akses portal data dan statistik tingkat kecamatan di seluruh wilayah Kabupaten Toli-Toli.",
+    tag: "Portal",
     bg: "#059669",
     iconBg: "rgba(255,255,255,0.18)",
     tagBg: "rgba(255,255,255,0.15)",
@@ -25,8 +25,8 @@ const cards = [
   {
     href: "/data-strategis",
     icon: Database,
-    title: "Data Mikro",
-    desc: "Eksplorasi indikator strategis BPS Toli-Toli dengan grafik dinamis dan tabel data.",
+    title: "Data Strategis",
+    desc: "Eksplorasi indikator dan data strategis BPS Toli-Toli dengan grafik dinamis dan tabel data.",
     tag: "Statistik",
     bg: "#D97706",
     iconBg: "rgba(255,255,255,0.18)",

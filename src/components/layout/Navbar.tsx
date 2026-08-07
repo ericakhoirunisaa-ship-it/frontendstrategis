@@ -143,11 +143,11 @@ export default function Navbar() {
             ))}
             <div className="pt-2 border-t border-slate-100 dark:border-slate-700/50 mt-2">
               <Link
-                href="/layanan-konsultasi"
+                href="/portal-daerah"
                 onClick={() => setOpen(false)}
                 className="flex items-center justify-center btn-primary w-full py-2.5 text-sm"
               >
-                Konsultasi Data
+                Portal Daerah
               </Link>
             </div>
           </div>
