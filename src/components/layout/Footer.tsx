@@ -39,6 +39,8 @@ export default function Footer() {
               {[
                 { href: "/", label: "Beranda" },
                 { href: "/data-strategis", label: "Data Strategis" },
+                { href: "/indikator-bulanan", label: "Ringkasan Indikator" },
+                { href: "/portal-daerah", label: "Portal Daerah" },
                 { href: "/infografis", label: "Infografis" },
                 { href: "/layanan-konsultasi", label: "Layanan Konsultasi" },
               ].map((link) => (

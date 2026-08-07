@@ -13,11 +13,13 @@ interface SearchResult {
 }
 
 const HALAMAN_STATIS: SearchResult[] = [
-  { id: "h-beranda",    type: "halaman", title: "Beranda",            subtitle: "Halaman utama SITARA",           href: "/" },
-  { id: "h-data",       type: "halaman", title: "Data Strategis",     subtitle: "Grafik dan tabel indikator",     href: "/data-strategis" },
-  { id: "h-infografis", type: "halaman", title: "Infografis",         subtitle: "Visualisasi data statistik",     href: "/infografis" },
-  { id: "h-jadwal",     type: "halaman", title: "Jadwal Rilis",       subtitle: "Kalender publikasi BPS",         href: "/jadwal-rilis" },
-  { id: "h-layanan",    type: "halaman", title: "Layanan Konsultasi", subtitle: "Konsultasi dan permintaan data", href: "/layanan-konsultasi" },
+  { id: "h-beranda",    type: "halaman", title: "Beranda",             subtitle: "Halaman utama SITARA",                href: "/" },
+  { id: "h-data",       type: "halaman", title: "Data Strategis",      subtitle: "Grafik dan tabel indikator",          href: "/data-strategis" },
+  { id: "h-indikator",  type: "halaman", title: "Ringkasan Indikator", subtitle: "Indikator bulanan Kab. Toli-Toli",    href: "/indikator-bulanan" },
+  { id: "h-portal",     type: "halaman", title: "Portal Daerah",       subtitle: "Dataset OPD Kabupaten Toli-Toli",     href: "/portal-daerah" },
+  { id: "h-infografis", type: "halaman", title: "Infografis",          subtitle: "Visualisasi data statistik",          href: "/infografis" },
+  { id: "h-jadwal",     type: "halaman", title: "Jadwal Rilis",        subtitle: "Kalender publikasi BPS",              href: "/jadwal-rilis" },
+  { id: "h-layanan",    type: "halaman", title: "Layanan Konsultasi",  subtitle: "Konsultasi dan permintaan data",      href: "/layanan-konsultasi" },
 ];
 
 const TYPE_CONFIG = {
