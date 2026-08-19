@@ -8,9 +8,10 @@ import {
   BarChart2, LineChart, TrendingUp, Filter,
   Download, FileSpreadsheet, FileText, Image as ImageIcon, FileDown,
   ChevronDown, ChevronRight, BookOpen, ChevronLeft,
-  Share2, Copy, Check, List, Database, Info,
+  Share2, Copy, Check, List, Database, Info, ExternalLink,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import Link from "next/link";
 
 const PAGE_SIZE = 10;
 
@@ -402,18 +403,22 @@ function KamusIndikator({ ind, activeCatColor }: { ind: Indikator; activeCatColo
 
 // ── Sidebar Category (dynamic from DB) ───────────────────────────────────────
 
+interface StaticLink { label: string; href: string; }
+
 function CategoryGroup({
   cat,
   indikators,
   selectedId,
   onSelect,
   defaultOpen,
+  staticLinks,
 }: {
   cat: typeof CATEGORY_DEFS[number];
   indikators: Indikator[];
   selectedId: number | null;
   onSelect: (ind: Indikator) => void;
   defaultOpen: boolean;
+  staticLinks?: StaticLink[];
 }) {
   const [open, setOpen] = useState(defaultOpen);
 
@@ -444,7 +449,21 @@ function CategoryGroup({
           className="ml-3 pl-3 border-l-2 mt-0.5 mb-1 space-y-0.5"
           style={{ borderColor: cat.color + "40" }}
         >
-          {indikators.length === 0 ? (
+          {/* Static page links (e.g. PDRB for Ekonomi) */}
+          {staticLinks?.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[12.5px] font-medium transition-colors text-gray-600 dark:text-slate-300 hover:text-white hover:bg-opacity-90"
+              style={{ "--hover-bg": cat.color } as React.CSSProperties}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = cat.color)}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "")}
+            >
+              <span>{link.label}</span>
+              <ExternalLink className="w-3 h-3 opacity-60 shrink-0" />
+            </Link>
+          ))}
+          {indikators.length === 0 && !staticLinks?.length ? (
             <p className="px-3 py-2 text-[12px] text-gray-300 dark:text-slate-500 italic">Belum ada indikator</p>
           ) : (
             indikators.map((ind) => (
@@ -607,7 +626,7 @@ export default function DataStrategisPage() {
               <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest px-3 py-2">
                 Pilih Indikator
               </p>
-              {CATEGORY_DEFS.map((cat, i) => (
+              {CATEGORY_DEFS.map((cat) => (
                 <CategoryGroup
                   key={cat.key}
                   cat={cat}
@@ -615,6 +634,11 @@ export default function DataStrategisPage() {
                   selectedId={selectedInd?.id ?? null}
                   onSelect={handleSelect}
                   defaultOpen={false}
+                  staticLinks={
+                    cat.key === "B"
+                      ? [{ label: "PDRB Lapangan Usaha & Pengeluaran", href: "/data-strategis/ekonomi" }]
+                      : undefined
+                  }
                 />
               ))}
             </div>
