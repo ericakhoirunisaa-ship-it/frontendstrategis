@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import DynamicChart from "@/components/charts/DynamicChart";
-import EkonomiPDRBPanel from "@/components/charts/EkonomiPDRBPanel";
+import EkonomiPDRBPanel, { type PdrbDatasetId } from "@/components/charts/EkonomiPDRBPanel";
 import { indikatorApi } from "@/lib/api";
 import {
   BarChart2, LineChart, TrendingUp, Filter,
@@ -493,7 +493,7 @@ function CategoryGroup({
 export default function DataStrategisPage() {
   const [dbIndikators, setDbIndikators] = useState<Indikator[]>([]);
   const [selectedInd, setSelectedInd] = useState<Indikator | null>(null);
-  const [pdrbMode, setPdrbMode] = useState(false);
+  const [pdrbDatasetId, setPdrbDatasetId] = useState<PdrbDatasetId | null>(null);
   const [data, setData] = useState<DataPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -523,7 +523,7 @@ export default function DataStrategisPage() {
   }
 
   const handleSelect = (ind: Indikator) => {
-    setPdrbMode(false);
+    setPdrbDatasetId(null);
     setSelectedInd(ind);
     setNotFound(false);
     setLoading(true);
@@ -639,11 +639,13 @@ export default function DataStrategisPage() {
                   defaultOpen={false}
                   staticItems={
                     cat.key === "B"
-                      ? [{
-                          label: "PDRB Lapangan Usaha & Pengeluaran",
-                          active: pdrbMode,
-                          onClick: () => { setPdrbMode(true); setSelectedInd(null); },
-                        }]
+                      ? [
+                          { label: "PDRB Atas Dasar Harga Berlaku (Lap. Usaha)",  active: pdrbDatasetId === "adhb_lu",  onClick: () => { setPdrbDatasetId("adhb_lu");  setSelectedInd(null); } },
+                          { label: "PDRB Atas Dasar Harga Konstan (Lap. Usaha)",  active: pdrbDatasetId === "adhk_lu",  onClick: () => { setPdrbDatasetId("adhk_lu");  setSelectedInd(null); } },
+                          { label: "Laju Pertumbuhan PDRB",                        active: pdrbDatasetId === "laju",     onClick: () => { setPdrbDatasetId("laju");     setSelectedInd(null); } },
+                          { label: "PDRB Atas Dasar Harga Berlaku (Pengeluaran)", active: pdrbDatasetId === "adhb_exp", onClick: () => { setPdrbDatasetId("adhb_exp"); setSelectedInd(null); } },
+                          { label: "PDRB Atas Dasar Harga Konstan (Pengeluaran)", active: pdrbDatasetId === "adhk_exp", onClick: () => { setPdrbDatasetId("adhk_exp"); setSelectedInd(null); } },
+                        ]
                       : undefined
                   }
                 />
@@ -654,7 +656,7 @@ export default function DataStrategisPage() {
           {/* ── Konten Utama ── */}
           <div className="lg:col-span-3 space-y-5">
 
-            {!selectedInd && !pdrbMode && (
+            {!selectedInd && !pdrbDatasetId && (
               <div className="bg-white dark:bg-[#0F1825] rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm flex items-center justify-center h-72">
                 <div className="text-center">
                   <BarChart2 className="w-12 h-12 text-gray-200 dark:text-slate-700 mx-auto mb-3" />
@@ -664,7 +666,7 @@ export default function DataStrategisPage() {
             )}
 
             {/* ── Panel PDRB Ekonomi ── */}
-            {pdrbMode && <EkonomiPDRBPanel />}
+            {pdrbDatasetId && <EkonomiPDRBPanel datasetId={pdrbDatasetId} />}
 
             {/* ── Grafik ── */}
             {selectedInd && (

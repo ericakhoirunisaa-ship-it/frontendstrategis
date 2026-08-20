@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart, Bar, LineChart, Line, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip,
@@ -231,25 +231,24 @@ function PdrbTooltip({ active, payload, label, satuan, namaMap }: any) {
 
 // ── Panel Component ───────────────────────────────────────────────────────────
 
-export default function EkonomiPDRBPanel() {
-  const [activeId, setActiveId]       = useState<PdrbDatasetId>("adhb_lu");
-  const [filterMode, setFilterMode]   = useState<"tahun" | "sektor">("tahun");
+export default function EkonomiPDRBPanel({ datasetId }: { datasetId: PdrbDatasetId }) {
+  const [filterMode, setFilterMode]       = useState<"tahun" | "sektor">("tahun");
   const [selectedTahun, setSelectedTahun] = useState<number>(2025);
   const [selectedSektor, setSelectedSektor] = useState<string>("A");
-  const [chartType, setChartType]     = useState<"bar" | "line" | "area">("bar");
+  const [chartType, setChartType]         = useState<"bar" | "line" | "area">("bar");
 
-  const ds = DATASETS.find(d => d.id === activeId)!;
-  const sektors = ds.type === "lu" ? SEKTOR_LU : PENGELUARAN;
-  const sektorLabel = ds.type === "lu" ? "Per Lapangan Usaha" : "Per Komponen";
-
-  const handleDatasetChange = (id: PdrbDatasetId) => {
-    const next = DATASETS.find(d => d.id === id)!;
-    setActiveId(id);
+  // Reset filters whenever the selected dataset changes from sidebar
+  useEffect(() => {
+    const next = DATASETS.find(d => d.id === datasetId)!;
     setFilterMode("tahun");
     setSelectedTahun(2025);
     setSelectedSektor(next.type === "lu" ? "A" : "RT");
     setChartType("bar");
-  };
+  }, [datasetId]);
+
+  const ds = DATASETS.find(d => d.id === datasetId)!;
+  const sektors = ds.type === "lu" ? SEKTOR_LU : PENGELUARAN;
+  const sektorLabel = ds.type === "lu" ? "Per Lapangan Usaha" : "Per Komponen";
 
   const tidx = TAHUN.indexOf(selectedTahun);
   const validSektor = sektors.some(s => s.kode === selectedSektor)
@@ -331,24 +330,6 @@ export default function EkonomiPDRBPanel() {
               ))}
             </div>
           )}
-        </div>
-
-        {/* Dataset pills */}
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {DATASETS.map(d => (
-            <button
-              key={d.id}
-              onClick={() => handleDatasetChange(d.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-                activeId === d.id
-                  ? "text-white border-transparent shadow-sm"
-                  : "text-gray-500 dark:text-slate-400 border-gray-200 dark:border-slate-700/50 hover:border-gray-300 dark:hover:border-slate-500"
-              }`}
-              style={activeId === d.id ? { backgroundColor: d.color, borderColor: d.color } : undefined}
-            >
-              {d.label}
-            </button>
-          ))}
         </div>
 
         {/* Filter row */}
