@@ -156,9 +156,9 @@ export default function PendidikanPanel({ datasetId }: { datasetId: PendidikanDa
     ? selectedDimensi
     : ds.dimensi[0].kode;
 
-  // Helper to get value from API data
-  const getValue = (daerah: string, tahun: number): number | null => {
-    const dp = apiData.find(d => d.daerah === daerah && d.tahun === tahun);
+  // APK/APM/APS CSVs store jenjang as `kolom` (e.g. kolom="SD"), not as `daerah`
+  const getValue = (kode: string, tahun: number): number | null => {
+    const dp = apiData.find(d => d.kolom === kode && d.tahun === tahun);
     return dp != null ? dp.nilai : null;
   };
 
