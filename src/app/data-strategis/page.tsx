@@ -4,6 +4,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import DynamicChart from "@/components/charts/DynamicChart";
 import EkonomiPDRBPanel, { type PdrbDatasetId } from "@/components/charts/EkonomiPDRBPanel";
+import PendidikanPanel, { type PendidikanDatasetId } from "@/components/charts/PendidikanPanel";
 import { indikatorApi } from "@/lib/api";
 import {
   BarChart2, LineChart, TrendingUp, Filter,
@@ -494,6 +495,7 @@ export default function DataStrategisPage() {
   const [dbIndikators, setDbIndikators] = useState<Indikator[]>([]);
   const [selectedInd, setSelectedInd] = useState<Indikator | null>(null);
   const [pdrbDatasetId, setPdrbDatasetId] = useState<PdrbDatasetId | null>(null);
+  const [pendidikanDatasetId, setPendidikanDatasetId] = useState<PendidikanDatasetId | null>(null);
   const [data, setData] = useState<DataPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -524,6 +526,7 @@ export default function DataStrategisPage() {
 
   const handleSelect = (ind: Indikator) => {
     setPdrbDatasetId(null);
+    setPendidikanDatasetId(null);
     setSelectedInd(ind);
     setNotFound(false);
     setLoading(true);
@@ -640,11 +643,17 @@ export default function DataStrategisPage() {
                   staticItems={
                     cat.key === "B"
                       ? [
-                          { label: "PDRB Atas Dasar Harga Berlaku (Lap. Usaha)",  active: pdrbDatasetId === "adhb_lu",  onClick: () => { setPdrbDatasetId("adhb_lu");  setSelectedInd(null); } },
-                          { label: "PDRB Atas Dasar Harga Konstan (Lap. Usaha)",  active: pdrbDatasetId === "adhk_lu",  onClick: () => { setPdrbDatasetId("adhk_lu");  setSelectedInd(null); } },
-                          { label: "Laju Pertumbuhan PDRB",                        active: pdrbDatasetId === "laju",     onClick: () => { setPdrbDatasetId("laju");     setSelectedInd(null); } },
-                          { label: "PDRB Atas Dasar Harga Berlaku (Pengeluaran)", active: pdrbDatasetId === "adhb_exp", onClick: () => { setPdrbDatasetId("adhb_exp"); setSelectedInd(null); } },
-                          { label: "PDRB Atas Dasar Harga Konstan (Pengeluaran)", active: pdrbDatasetId === "adhk_exp", onClick: () => { setPdrbDatasetId("adhk_exp"); setSelectedInd(null); } },
+                          { label: "PDRB Atas Dasar Harga Berlaku (Lap. Usaha)",  active: pdrbDatasetId === "adhb_lu",  onClick: () => { setPdrbDatasetId("adhb_lu");  setPendidikanDatasetId(null); setSelectedInd(null); } },
+                          { label: "PDRB Atas Dasar Harga Konstan (Lap. Usaha)",  active: pdrbDatasetId === "adhk_lu",  onClick: () => { setPdrbDatasetId("adhk_lu");  setPendidikanDatasetId(null); setSelectedInd(null); } },
+                          { label: "Laju Pertumbuhan PDRB",                        active: pdrbDatasetId === "laju",     onClick: () => { setPdrbDatasetId("laju");     setPendidikanDatasetId(null); setSelectedInd(null); } },
+                          { label: "PDRB Atas Dasar Harga Berlaku (Pengeluaran)", active: pdrbDatasetId === "adhb_exp", onClick: () => { setPdrbDatasetId("adhb_exp"); setPendidikanDatasetId(null); setSelectedInd(null); } },
+                          { label: "PDRB Atas Dasar Harga Konstan (Pengeluaran)", active: pdrbDatasetId === "adhk_exp", onClick: () => { setPdrbDatasetId("adhk_exp"); setPendidikanDatasetId(null); setSelectedInd(null); } },
+                        ]
+                      : cat.key === "F"
+                      ? [
+                          { label: "Angka Partisipasi Kasar (APK)",   active: pendidikanDatasetId === "apk", onClick: () => { setPendidikanDatasetId("apk");  setPdrbDatasetId(null); setSelectedInd(null); } },
+                          { label: "Angka Partisipasi Murni (APM)",   active: pendidikanDatasetId === "apm", onClick: () => { setPendidikanDatasetId("apm");  setPdrbDatasetId(null); setSelectedInd(null); } },
+                          { label: "Angka Partisipasi Sekolah (APS)", active: pendidikanDatasetId === "aps", onClick: () => { setPendidikanDatasetId("aps");  setPdrbDatasetId(null); setSelectedInd(null); } },
                         ]
                       : undefined
                   }
@@ -656,7 +665,7 @@ export default function DataStrategisPage() {
           {/* ── Konten Utama ── */}
           <div className="lg:col-span-3 space-y-5">
 
-            {!selectedInd && !pdrbDatasetId && (
+            {!selectedInd && !pdrbDatasetId && !pendidikanDatasetId && (
               <div className="bg-white dark:bg-[#0F1825] rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm flex items-center justify-center h-72">
                 <div className="text-center">
                   <BarChart2 className="w-12 h-12 text-gray-200 dark:text-slate-700 mx-auto mb-3" />
@@ -667,6 +676,9 @@ export default function DataStrategisPage() {
 
             {/* ── Panel PDRB Ekonomi ── */}
             {pdrbDatasetId && <EkonomiPDRBPanel datasetId={pdrbDatasetId} />}
+
+            {/* ── Panel Pendidikan ── */}
+            {pendidikanDatasetId && <PendidikanPanel datasetId={pendidikanDatasetId} />}
 
             {/* ── Grafik ── */}
             {selectedInd && (

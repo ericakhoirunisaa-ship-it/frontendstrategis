@@ -9,6 +9,8 @@ import {
   BarChart2, LineChart as LineIcon, TrendingUp,
   Filter, Download, FileSpreadsheet,
 } from "lucide-react";
+import KamusStatikPanel from "./KamusStatikPanel";
+import { indikatorApi } from "@/lib/api";
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 
@@ -46,89 +48,6 @@ const PENGELUARAN = [
   { kode: "EXPO",  nama: "Net Ekspor Barang dan Jasa",         short: "Net Ekspor" },
 ];
 
-const ADHB_LU: Record<string, number[]> = {
-  A:    [3520.94, 3812.54, 4060.59, 4353.56, 4876.85],
-  B:    [156.61,  175.17,  191.89,  207.38,  210.30],
-  C:    [206.70,  216.18,  220.65,  230.23,  246.39],
-  D:    [2.28,    2.49,    2.64,    2.83,    2.95],
-  E:    [22.58,   24.05,   25.10,   26.40,   28.51],
-  F:    [1062.10, 1195.36, 1283.81, 1388.11, 1412.10],
-  G:    [862.35,  983.31,  1074.36, 1168.53, 1241.70],
-  H:    [336.60,  400.09,  435.24,  454.37,  475.39],
-  I:    [52.69,   58.28,   63.65,   69.88,   75.12],
-  J:    [472.61,  508.58,  542.39,  567.52,  591.00],
-  K:    [326.32,  351.18,  357.13,  397.09,  425.67],
-  L:    [210.36,  227.10,  254.28,  277.51,  292.16],
-  MN:   [16.89,   18.19,   19.86,   21.11,   22.80],
-  O:    [943.90,  971.89,  1031.93, 1083.04, 1126.33],
-  P:    [423.24,  448.08,  475.21,  478.76,  504.94],
-  Q:    [147.45,  156.69,  170.03,  178.45,  187.64],
-  RSTU: [137.57,  148.09,  160.17,  170.17,  180.67],
-  PDRB: [8901.21, 9697.26, 10368.93, 11074.94, 11900.53],
-};
-
-const ADHK_LU: Record<string, number[]> = {
-  A:    [2431.67, 2476.89, 2529.24, 2570.54, 2702.40],
-  B:    [99.59,   104.97,  110.35,  115.00,  113.74],
-  C:    [138.79,  142.50,  144.21,  146.76,  150.00],
-  D:    [2.15,    2.31,    2.42,    2.59,    2.63],
-  E:    [13.87,   14.30,   14.62,   15.18,   16.17],
-  F:    [609.84,  650.89,  675.94,  706.17,  701.08],
-  G:    [495.58,  542.11,  573.46,  612.26,  637.44],
-  H:    [217.51,  239.30,  251.60,  260.13,  270.74],
-  I:    [32.81,   35.68,   38.46,   41.64,   43.44],
-  J:    [371.87,  397.81,  424.78,  441.13,  459.60],
-  K:    [212.08,  208.81,  210.01,  232.96,  247.13],
-  L:    [148.75,  157.79,  166.57,  173.45,  181.14],
-  MN:   [10.16,   10.66,   11.27,   11.63,   12.12],
-  O:    [546.31,  542.54,  563.91,  583.75,  599.15],
-  P:    [277.27,  284.62,  296.06,  298.05,  308.37],
-  Q:    [87.02,   90.26,   94.63,   98.49,   102.48],
-  RSTU: [80.96,   85.13,   89.83,   93.76,   98.64],
-  PDRB: [5776.24, 5986.58, 6197.36, 6403.50, 6646.27],
-};
-
-const LAJU_LU: Record<string, number[]> = {
-  A:    [2.90,  1.86,  2.13,  1.61,  5.13],
-  B:    [4.46,  5.39,  5.13,  4.21, -1.09],
-  C:    [1.08,  2.67,  1.20,  1.77,  2.20],
-  D:    [3.27,  7.25,  4.83,  6.94,  1.69],
-  E:    [3.08,  3.07,  2.24,  3.81,  6.55],
-  F:    [5.74,  6.73,  3.85,  4.47, -0.72],
-  G:    [8.76,  9.39,  5.78,  6.77,  4.11],
-  H:    [5.78, 10.02,  5.14,  3.39,  4.08],
-  I:    [7.95,  8.74,  7.80,  8.28,  4.32],
-  J:    [8.09,  6.98,  6.78,  3.85,  4.19],
-  K:    [9.99, -1.54,  0.58, 10.93,  6.08],
-  L:    [1.35,  6.08,  5.56,  4.13,  4.43],
-  MN:   [3.57,  4.88,  5.73,  3.18,  4.19],
-  O:    [3.93, -0.69,  3.94,  3.52,  2.64],
-  P:    [0.94,  2.65,  4.02,  0.67,  3.46],
-  Q:    [4.75,  3.73,  4.84,  4.08,  4.05],
-  RSTU: [3.61,  5.15,  5.52,  4.37,  5.20],
-  PDRB: [4.36,  3.64,  3.53,  3.32,  3.79],
-};
-
-const ADHB_EXP: Record<string, number[]> = {
-  RT:    [4872.8,  5290.3,  5803.6,   6218.36,  6749.40],
-  LNPRT: [106.2,   118.1,   131.8,    148.47,   161.23],
-  GOV:   [1433.7,  1442.1,  1528.6,   1675.43,  1616.85],
-  PMTB:  [2932.3,  3294.1,  3493.4,   3691.95,  3784.70],
-  INV:   [160.9,   179.9,   136.5,    154.34,   199.10],
-  EXPO:  [-604.7, -627.3,  -724.99,  -813.61,  -610.76],
-  PDRB:  [8901.2,  9697.2, 10368.9, 11074.94, 11900.53],
-};
-
-const ADHK_EXP: Record<string, number[]> = {
-  RT:    [2908.8,  3022.5,  3189.6,  3339.85,  3520.18],
-  LNPRT: [63.3,    67.1,    71.1,    78.61,    83.87],
-  GOV:   [802.8,   788.1,   810.3,   882.42,   841.99],
-  PMTB:  [2054.9,  2178.6,  2209.7,  2260.27,  2264.99],
-  INV:   [103.2,   107.8,    75.4,    79.18,    99.36],
-  EXPO:  [-156.8, -177.6,  -158.7,  -236.82,  -164.13],
-  PDRB:  [5776.2,  5986.5,  6197.4,  6403.50,  6646.27],
-};
-
 // ── Dataset Config ────────────────────────────────────────────────────────────
 
 export type PdrbDatasetId = "adhb_lu" | "adhk_lu" | "laju" | "adhb_exp" | "adhk_exp";
@@ -140,15 +59,15 @@ interface PdrbDataset {
   satuan: string;
   color: string;
   type: "lu" | "exp";
-  data: Record<string, number[]>;
+  slug: string;
 }
 
 const DATASETS: PdrbDataset[] = [
-  { id: "adhb_lu",  label: "PDRB ADHB",       deskripsi: "Atas Dasar Harga Berlaku Menurut Lapangan Usaha (Miliar Rp)",             satuan: "Miliar Rp", color: "#059669", type: "lu",  data: ADHB_LU },
-  { id: "adhk_lu",  label: "PDRB ADHK",        deskripsi: "Atas Dasar Harga Konstan 2010 Menurut Lapangan Usaha (Miliar Rp)",        satuan: "Miliar Rp", color: "#2196F3", type: "lu",  data: ADHK_LU },
-  { id: "laju",     label: "Laju Pertumbuhan",  deskripsi: "Laju Pertumbuhan PDRB Atas Dasar Harga Konstan 2010 (%)",                satuan: "%",         color: "#FF9800", type: "lu",  data: LAJU_LU },
-  { id: "adhb_exp", label: "Pengeluaran ADHB",  deskripsi: "PDRB Atas Dasar Harga Berlaku Menurut Pengeluaran (Miliar Rp)",          satuan: "Miliar Rp", color: "#7C3AED", type: "exp", data: ADHB_EXP },
-  { id: "adhk_exp", label: "Pengeluaran ADHK",  deskripsi: "PDRB Atas Dasar Harga Konstan 2010 Menurut Pengeluaran (Miliar Rp)",     satuan: "Miliar Rp", color: "#DC2626", type: "exp", data: ADHK_EXP },
+  { id: "adhb_lu",  label: "PDRB ADHB",       deskripsi: "Atas Dasar Harga Berlaku Menurut Lapangan Usaha (Miliar Rp)",             satuan: "Miliar Rp", color: "#059669", type: "lu",  slug: "pdrb-adhb-lapangan-usaha"  },
+  { id: "adhk_lu",  label: "PDRB ADHK",        deskripsi: "Atas Dasar Harga Konstan 2010 Menurut Lapangan Usaha (Miliar Rp)",        satuan: "Miliar Rp", color: "#2196F3", type: "lu",  slug: "pdrb-adhk-lapangan-usaha"  },
+  { id: "laju",     label: "Laju Pertumbuhan",  deskripsi: "Laju Pertumbuhan PDRB Atas Dasar Harga Konstan 2010 (%)",                satuan: "%",         color: "#FF9800", type: "lu",  slug: "laju-pertumbuhan-pdrb"     },
+  { id: "adhb_exp", label: "Pengeluaran ADHB",  deskripsi: "PDRB Atas Dasar Harga Berlaku Menurut Pengeluaran (Miliar Rp)",          satuan: "Miliar Rp", color: "#7C3AED", type: "exp", slug: "pdrb-adhb-pengeluaran"     },
+  { id: "adhk_exp", label: "Pengeluaran ADHK",  deskripsi: "PDRB Atas Dasar Harga Konstan 2010 Menurut Pengeluaran (Miliar Rp)",     satuan: "Miliar Rp", color: "#DC2626", type: "exp", slug: "pdrb-adhk-pengeluaran"     },
 ];
 
 const SEKTOR_COLORS = [
@@ -174,44 +93,6 @@ function triggerDownload(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-function downloadCSV(
-  ds: PdrbDataset, mode: "tahun" | "sektor",
-  tidx: number, sektor: string,
-  sektors: { kode: string; nama: string }[],
-) {
-  let csv = "";
-  if (mode === "tahun") {
-    csv = `Lapangan Usaha/Komponen,Nilai (${ds.satuan})\n`;
-    sektors.forEach(s => { csv += `"${s.nama}",${ds.data[s.kode]?.[tidx] ?? ""}\n`; });
-    csv += `"PDRB Total",${ds.data["PDRB"]?.[tidx] ?? ""}\n`;
-  } else {
-    csv = `Tahun,Nilai (${ds.satuan})\n`;
-    TAHUN.forEach((_, i) => { csv += `${TAHUN_LABELS[TAHUN[i]]},${ds.data[sektor]?.[i] ?? ""}\n`; });
-  }
-  triggerDownload(new Blob([csv], { type: "text/csv;charset=utf-8" }), `${ds.label}.csv`);
-}
-
-async function downloadExcel(
-  ds: PdrbDataset, mode: "tahun" | "sektor",
-  tidx: number, sektor: string,
-  sektors: { kode: string; nama: string }[],
-) {
-  const XLSX = await import("xlsx");
-  let rows: (string | number)[][];
-  if (mode === "tahun") {
-    rows = [["Lapangan Usaha/Komponen", `Nilai (${ds.satuan})`]];
-    sektors.forEach(s => rows.push([s.nama, ds.data[s.kode]?.[tidx] ?? ""]));
-    rows.push(["PDRB Total", ds.data["PDRB"]?.[tidx] ?? ""]);
-  } else {
-    rows = [["Tahun", `Nilai (${ds.satuan})`]];
-    TAHUN.forEach((_, i) => rows.push([TAHUN_LABELS[TAHUN[i]], ds.data[sektor]?.[i] ?? ""]));
-  }
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Data");
-  XLSX.writeFile(wb, `${ds.label}.xlsx`);
-}
-
 // ── Custom Tooltip ────────────────────────────────────────────────────────────
 
 function PdrbTooltip({ active, payload, label, satuan, namaMap }: any) {
@@ -232,47 +113,68 @@ function PdrbTooltip({ active, payload, label, satuan, namaMap }: any) {
 // ── Panel Component ───────────────────────────────────────────────────────────
 
 export default function EkonomiPDRBPanel({ datasetId }: { datasetId: PdrbDatasetId }) {
-  const [filterMode, setFilterMode]       = useState<"tahun" | "sektor">("tahun");
-  const [selectedTahun, setSelectedTahun] = useState<number>(2025);
+  const [filterMode, setFilterMode]         = useState<"tahun" | "sektor">("tahun");
+  const [selectedTahun, setSelectedTahun]   = useState<number>(2025);
   const [selectedSektor, setSelectedSektor] = useState<string>("A");
-  const [chartType, setChartType]         = useState<"bar" | "line" | "area">("bar");
+  const [chartType, setChartType]           = useState<"bar" | "line" | "area">("bar");
+  const [apiData, setApiData]               = useState<Array<{ tahun: number; daerah: string; kolom: string; nilai: number }>>([]);
+  const [loadingData, setLoadingData]       = useState(false);
 
-  // Reset filters whenever the selected dataset changes from sidebar
+  // Reset filters and fetch data whenever the selected dataset changes from sidebar
   useEffect(() => {
     const next = DATASETS.find(d => d.id === datasetId)!;
     setFilterMode("tahun");
     setSelectedTahun(2025);
     setSelectedSektor(next.type === "lu" ? "A" : "RT");
     setChartType("bar");
+    // Fetch data from API
+    setLoadingData(true);
+    setApiData([]);
+    indikatorApi.getBySlug(next.slug)
+      .then(r => setApiData(r.data?.data ?? []))
+      .catch(() => setApiData([]))
+      .finally(() => setLoadingData(false));
   }, [datasetId]);
 
   const ds = DATASETS.find(d => d.id === datasetId)!;
   const sektors = ds.type === "lu" ? SEKTOR_LU : PENGELUARAN;
   const sektorLabel = ds.type === "lu" ? "Per Lapangan Usaha" : "Per Komponen";
 
-  const tidx = TAHUN.indexOf(selectedTahun);
   const validSektor = sektors.some(s => s.kode === selectedSektor)
     ? selectedSektor
     : sektors[0].kode;
 
+  // Helper to get value from API data
+  const getValue = (daerah: string, tahun: number): number | null => {
+    const dp = apiData.find(d => d.daerah === daerah && d.tahun === tahun);
+    return dp != null ? dp.nilai : null;
+  };
+
+  // PDRB total from API
+  const pdrbTotal = getValue("PDRB", selectedTahun);
+
   // Chart data — Per Tahun
   const chartDataTahun = [...sektors]
-    .map((s, i) => ({
-      short: s.short,
-      nama:  s.nama,
-      nilai: ds.data[s.kode]?.[tidx] ?? 0,
-      color: SEKTOR_COLORS[i % SEKTOR_COLORS.length],
-    }))
+    .map((s, i) => {
+      const v = getValue(s.kode, selectedTahun);
+      return {
+        short: s.short,
+        nama: s.nama,
+        nilai: v ?? 0,
+        hasData: v != null,
+        color: SEKTOR_COLORS[i % SEKTOR_COLORS.length],
+      };
+    })
+    .filter(d => d.hasData)
     .sort((a, b) => Math.abs(b.nilai) - Math.abs(a.nilai));
 
   // Chart data — Per Sektor
-  const chartDataSektor = TAHUN.map((_, i) => ({
+  const chartDataSektor = TAHUN.map((t, i) => ({
     tahun: TAHUN_LABELS[TAHUN[i]],
-    nilai: ds.data[validSektor]?.[i] ?? 0,
+    nilai: getValue(validSektor, t) ?? 0,
   }));
 
-  const pdrbTotal   = ds.data["PDRB"]?.[tidx];
-  const isLaju      = ds.id === "laju";
+  const isLaju = ds.id === "laju";
   const namaMapTahun = Object.fromEntries(chartDataTahun.map(d => [d.short, d.nama]));
   const selectedSektorNama = sektors.find(s => s.kode === validSektor)?.nama || validSektor;
 
@@ -281,16 +183,61 @@ export default function EkonomiPDRBPanel({ datasetId }: { datasetId: PdrbDataset
     ? [
         ...sektors.map((s, i) => ({
           label: s.nama, isTotal: false,
-          nilai: ds.data[s.kode]?.[tidx] ?? 0,
+          nilai: getValue(s.kode, selectedTahun),
           color: SEKTOR_COLORS[i % SEKTOR_COLORS.length],
         })),
-        { label: "PDRB Total", isTotal: true, nilai: ds.data["PDRB"]?.[tidx] ?? 0, color: "" },
+        { label: "PDRB Total", isTotal: true, nilai: getValue("PDRB", selectedTahun), color: "" },
       ]
-    : TAHUN.map((_, i) => ({
+    : TAHUN.map((t, i) => ({
         label: TAHUN_LABELS[TAHUN[i]], isTotal: false,
-        nilai: ds.data[validSektor]?.[i] ?? 0,
+        nilai: getValue(validSektor, t),
         color: ds.color,
       }));
+
+  // Download helpers using apiData
+  const handleDownloadCSV = () => {
+    let csv = "";
+    if (filterMode === "tahun") {
+      csv = `Lapangan Usaha/Komponen,Nilai (${ds.satuan})\n`;
+      sektors.forEach(s => {
+        const v = getValue(s.kode, selectedTahun);
+        csv += `"${s.nama}",${v != null ? v : ""}\n`;
+      });
+      const total = getValue("PDRB", selectedTahun);
+      csv += `"PDRB Total",${total != null ? total : ""}\n`;
+    } else {
+      csv = `Tahun,Nilai (${ds.satuan})\n`;
+      TAHUN.forEach(t => {
+        const v = getValue(validSektor, t);
+        csv += `${TAHUN_LABELS[t]},${v != null ? v : ""}\n`;
+      });
+    }
+    triggerDownload(new Blob([csv], { type: "text/csv;charset=utf-8" }), `${ds.label}.csv`);
+  };
+
+  const handleDownloadExcel = async () => {
+    const XLSX = await import("xlsx");
+    let rows: (string | number)[][];
+    if (filterMode === "tahun") {
+      rows = [["Lapangan Usaha/Komponen", `Nilai (${ds.satuan})`]];
+      sektors.forEach(s => {
+        const v = getValue(s.kode, selectedTahun);
+        rows.push([s.nama, v != null ? v : ""]);
+      });
+      const total = getValue("PDRB", selectedTahun);
+      rows.push(["PDRB Total", total != null ? total : ""]);
+    } else {
+      rows = [["Tahun", `Nilai (${ds.satuan})`]];
+      TAHUN.forEach(t => {
+        const v = getValue(validSektor, t);
+        rows.push([TAHUN_LABELS[t], v != null ? v : ""]);
+      });
+    }
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data");
+    XLSX.writeFile(wb, `${ds.label}.xlsx`);
+  };
 
   return (
     <div className="space-y-5">
@@ -392,7 +339,15 @@ export default function EkonomiPDRBPanel({ datasetId }: { datasetId: PdrbDataset
         </div>
 
         {/* ── Chart ── */}
-        {filterMode === "tahun" ? (
+        {loadingData ? (
+          <div className="flex items-center justify-center h-48 text-gray-400 dark:text-slate-500 text-sm">Memuat data...</div>
+        ) : apiData.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-48 text-gray-400 dark:text-slate-500 text-sm gap-2">
+            <BarChart2 className="w-10 h-10 text-gray-200 dark:text-slate-700" />
+            <p>Belum ada data. Upload data melalui Admin → Indikator &amp; Data.</p>
+            <p className="text-xs">Slug: <code className="bg-gray-100 dark:bg-slate-700 px-1 rounded">{ds.slug}</code></p>
+          </div>
+        ) : filterMode === "tahun" ? (
           <ResponsiveContainer width="100%" height={sektors.length * 46 + 30}>
             <BarChart
               data={chartDataTahun}
@@ -516,13 +471,13 @@ export default function EkonomiPDRBPanel({ datasetId }: { datasetId: PdrbDataset
           </h3>
           <div className="flex gap-1.5">
             <button
-              onClick={() => downloadCSV(ds, filterMode, tidx, validSektor, sektors)}
+              onClick={handleDownloadCSV}
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700/50 text-xs text-gray-500 dark:text-slate-400 hover:text-green-600 hover:border-green-400 transition-colors"
             >
               <Download className="w-3.5 h-3.5" /> CSV
             </button>
             <button
-              onClick={() => downloadExcel(ds, filterMode, tidx, validSektor, sektors)}
+              onClick={handleDownloadExcel}
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700/50 text-xs text-gray-500 dark:text-slate-400 hover:text-green-600 hover:border-green-400 transition-colors"
             >
               <FileSpreadsheet className="w-3.5 h-3.5" /> Excel
@@ -569,8 +524,8 @@ export default function EkonomiPDRBPanel({ datasetId }: { datasetId: PdrbDataset
                   </td>
                   <td className="py-2.5 px-3 text-right whitespace-nowrap">
                     <span className={`font-semibold ${
-                      isLaju && row.nilai < 0 ? "text-red-500"
-                      : isLaju && row.nilai > 0 ? "text-emerald-600 dark:text-emerald-400"
+                      isLaju && row.nilai != null && row.nilai < 0 ? "text-red-500"
+                      : isLaju && row.nilai != null && row.nilai > 0 ? "text-emerald-600 dark:text-emerald-400"
                       : "text-[#1A1A2E] dark:text-white"
                     } ${row.isTotal ? "text-base" : ""}`}>
                       {row.nilai != null
@@ -589,6 +544,9 @@ export default function EkonomiPDRBPanel({ datasetId }: { datasetId: PdrbDataset
           Sumber: BPS Kabupaten Toli-Toli
         </p>
       </div>
+
+      {/* ── Kamus Indikator ── */}
+      <KamusStatikPanel slug={ds.slug} color={ds.color} />
     </div>
   );
 }
