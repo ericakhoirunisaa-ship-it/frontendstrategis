@@ -3,15 +3,15 @@ import { useEffect, useState, useRef } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import DynamicChart from "@/components/charts/DynamicChart";
+import EkonomiPDRBPanel from "@/components/charts/EkonomiPDRBPanel";
 import { indikatorApi } from "@/lib/api";
 import {
   BarChart2, LineChart, TrendingUp, Filter,
   Download, FileSpreadsheet, FileText, Image as ImageIcon, FileDown,
   ChevronDown, ChevronRight, BookOpen, ChevronLeft,
-  Share2, Copy, Check, List, Database, Info, ExternalLink,
+  Share2, Copy, Check, List, Database, Info,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import Link from "next/link";
 
 const PAGE_SIZE = 10;
 
@@ -403,7 +403,7 @@ function KamusIndikator({ ind, activeCatColor }: { ind: Indikator; activeCatColo
 
 // ── Sidebar Category (dynamic from DB) ───────────────────────────────────────
 
-interface StaticLink { label: string; href: string; }
+interface StaticItem { label: string; onClick: () => void; active?: boolean; }
 
 function CategoryGroup({
   cat,
@@ -411,14 +411,14 @@ function CategoryGroup({
   selectedId,
   onSelect,
   defaultOpen,
-  staticLinks,
+  staticItems,
 }: {
   cat: typeof CATEGORY_DEFS[number];
   indikators: Indikator[];
   selectedId: number | null;
   onSelect: (ind: Indikator) => void;
   defaultOpen: boolean;
-  staticLinks?: StaticLink[];
+  staticItems?: StaticItem[];
 }) {
   const [open, setOpen] = useState(defaultOpen);
 
@@ -449,21 +449,22 @@ function CategoryGroup({
           className="ml-3 pl-3 border-l-2 mt-0.5 mb-1 space-y-0.5"
           style={{ borderColor: cat.color + "40" }}
         >
-          {/* Static page links (e.g. PDRB for Ekonomi) */}
-          {staticLinks?.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[12.5px] font-medium transition-colors text-gray-600 dark:text-slate-300 hover:text-white hover:bg-opacity-90"
-              style={{ "--hover-bg": cat.color } as React.CSSProperties}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = cat.color)}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "")}
+          {/* Static action items (e.g. PDRB panel for Ekonomi) */}
+          {staticItems?.map((item) => (
+            <button
+              key={item.label}
+              onClick={item.onClick}
+              className={`w-full text-left px-3 py-2 rounded-lg text-[12.5px] transition-colors leading-snug ${
+                item.active
+                  ? "font-semibold text-white"
+                  : "text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-700/50 font-medium"
+              }`}
+              style={item.active ? { backgroundColor: cat.color } : undefined}
             >
-              <span>{link.label}</span>
-              <ExternalLink className="w-3 h-3 opacity-60 shrink-0" />
-            </Link>
+              {item.label}
+            </button>
           ))}
-          {indikators.length === 0 && !staticLinks?.length ? (
+          {indikators.length === 0 && !staticItems?.length ? (
             <p className="px-3 py-2 text-[12px] text-gray-300 dark:text-slate-500 italic">Belum ada indikator</p>
           ) : (
             indikators.map((ind) => (
@@ -492,6 +493,7 @@ function CategoryGroup({
 export default function DataStrategisPage() {
   const [dbIndikators, setDbIndikators] = useState<Indikator[]>([]);
   const [selectedInd, setSelectedInd] = useState<Indikator | null>(null);
+  const [pdrbMode, setPdrbMode] = useState(false);
   const [data, setData] = useState<DataPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -521,6 +523,7 @@ export default function DataStrategisPage() {
   }
 
   const handleSelect = (ind: Indikator) => {
+    setPdrbMode(false);
     setSelectedInd(ind);
     setNotFound(false);
     setLoading(true);
@@ -634,9 +637,13 @@ export default function DataStrategisPage() {
                   selectedId={selectedInd?.id ?? null}
                   onSelect={handleSelect}
                   defaultOpen={false}
-                  staticLinks={
+                  staticItems={
                     cat.key === "B"
-                      ? [{ label: "PDRB Lapangan Usaha & Pengeluaran", href: "/data-strategis/ekonomi" }]
+                      ? [{
+                          label: "PDRB Lapangan Usaha & Pengeluaran",
+                          active: pdrbMode,
+                          onClick: () => { setPdrbMode(true); setSelectedInd(null); },
+                        }]
                       : undefined
                   }
                 />
@@ -647,7 +654,7 @@ export default function DataStrategisPage() {
           {/* ── Konten Utama ── */}
           <div className="lg:col-span-3 space-y-5">
 
-            {!selectedInd && (
+            {!selectedInd && !pdrbMode && (
               <div className="bg-white dark:bg-[#0F1825] rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm flex items-center justify-center h-72">
                 <div className="text-center">
                   <BarChart2 className="w-12 h-12 text-gray-200 dark:text-slate-700 mx-auto mb-3" />
@@ -655,6 +662,9 @@ export default function DataStrategisPage() {
                 </div>
               </div>
             )}
+
+            {/* ── Panel PDRB Ekonomi ── */}
+            {pdrbMode && <EkonomiPDRBPanel />}
 
             {/* ── Grafik ── */}
             {selectedInd && (
