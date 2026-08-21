@@ -515,11 +515,21 @@ export default function DataStrategisPage() {
     indikatorApi.getAll().then((r) => setDbIndikators(r.data));
   }, []);
 
+  // Slugs handled by special panels (EkonomiPDRBPanel, PendidikanPanel) —
+  // these exist in DB so panels can fetch data by slug, but must NOT appear
+  // as regular sidebar items since they're already shown via staticItems.
+  const PANEL_SLUGS = new Set([
+    "pdrb-adhb-lapangan-usaha", "pdrb-adhk-lapangan-usaha",
+    "laju-pertumbuhan-pdrb", "pdrb-adhb-pengeluaran", "pdrb-adhk-pengeluaran",
+    "angka-partisipasi-kasar", "angka-partisipasi-murni", "angka-partisipasi-sekolah",
+  ]);
+
   // Group DB indicators by kategori (only the 6 fixed categories)
   const kategoriGroups = new Map<string, Indikator[]>(
     CATEGORY_DEFS.map((c) => [c.kategori, []])
   );
   for (const ind of dbIndikators) {
+    if (PANEL_SLUGS.has(ind.slug)) continue;
     const group = kategoriGroups.get(ind.kategori);
     if (group) group.push(ind);
   }
