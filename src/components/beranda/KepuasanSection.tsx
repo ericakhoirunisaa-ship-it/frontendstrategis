@@ -118,7 +118,7 @@ function QuestionGroup({
   );
 }
 
-export default function KepuasanSection() {
+export default function KepuasanSection({ hideHeader = false }: { hideHeader?: boolean }) {
   const [values, setValues] = useState<Record<string, number>>({});
   const [nama, setNama] = useState("");
   const [instansi, setInstansi] = useState("");
@@ -168,15 +168,17 @@ export default function KepuasanSection() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <span className="section-tag mb-2">Evaluasi Pengguna</span>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white mb-2">
-            Survei Kepuasan Pengguna SITARA
-          </h2>
-          <p className="text-gray-500 dark:text-slate-400 text-sm max-w-xl mx-auto">
-            Bantu kami meningkatkan SITARA dengan mengisi survei singkat ini. Penilaian menggunakan skala bintang 1–5.
-          </p>
-        </div>
+        {!hideHeader && (
+          <div className="text-center mb-8">
+            <span className="section-tag mb-2">Evaluasi Pengguna</span>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white mb-2">
+              Survei Kepuasan Pengguna SITARA
+            </h2>
+            <p className="text-gray-500 dark:text-slate-400 text-sm max-w-xl mx-auto">
+              Bantu kami meningkatkan SITARA dengan mengisi survei singkat ini. Penilaian menggunakan skala bintang 1–5.
+            </p>
+          </div>
+        )}
 
         {/* Intro */}
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 rounded-xl px-5 py-4 mb-6 text-xs text-gray-600 dark:text-slate-300 leading-relaxed">
