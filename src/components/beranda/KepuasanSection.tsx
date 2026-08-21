@@ -27,61 +27,61 @@ const KEPUASAN = [
 ];
 
 const LABELS_SETUJU = ["Sangat Tidak Setuju", "Tidak Setuju", "Netral", "Setuju", "Sangat Setuju"];
-const LABELS_PUAS   = ["Sangat Tidak Puas",   "Kurang Puas",  "Cukup", "Puas",  "Sangat Puas"];
+const LABELS_PUAS   = ["Sangat Tidak Puas", "Kurang Puas", "Cukup", "Puas", "Sangat Puas"];
 
-function StarInput({ fieldKey, value, onChange }: { fieldKey: string; value: number; onChange: (v: number) => void }) {
+function StarInput({
+  value, onChange, labels,
+}: { value: number; onChange: (v: number) => void; labels: string[] }) {
   const [hovered, setHovered] = useState(0);
+  const active = hovered || value;
   return (
-    <div className="flex gap-1">
+    <div className="flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((i) => (
         <button
-          key={i}
-          type="button"
+          key={i} type="button"
           onMouseEnter={() => setHovered(i)}
           onMouseLeave={() => setHovered(0)}
           onClick={() => onChange(i)}
           className="focus:outline-none"
-          aria-label={`${i} bintang`}
         >
           <Star
             className="w-6 h-6 transition-colors"
-            fill={(hovered || value) >= i ? "#F59E0B" : "none"}
-            stroke={(hovered || value) >= i ? "#F59E0B" : "#D1D5DB"}
+            fill={active >= i ? "#F59E0B" : "none"}
+            stroke={active >= i ? "#F59E0B" : "#D1D5DB"}
           />
         </button>
       ))}
       {value > 0 && (
-        <span className="ml-1 text-xs text-amber-600 dark:text-amber-400 self-center font-medium">
-          {LABELS_SETUJU[value - 1]}
+        <span className="ml-1.5 text-xs text-amber-600 dark:text-amber-400 font-medium hidden sm:inline">
+          {labels[value - 1]}
         </span>
       )}
     </div>
   );
 }
 
-function SatisfactionInput({ fieldKey, value, onChange }: { fieldKey: string; value: number; onChange: (v: number) => void }) {
+function SatisfactionInput({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   const [hovered, setHovered] = useState(0);
+  const active = hovered || value;
   return (
-    <div className="flex gap-1">
+    <div className="flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((i) => (
         <button
-          key={i}
-          type="button"
+          key={i} type="button"
           onMouseEnter={() => setHovered(i)}
           onMouseLeave={() => setHovered(0)}
           onClick={() => onChange(i)}
           className="focus:outline-none"
-          aria-label={`${i} bintang`}
         >
           <Star
             className="w-6 h-6 transition-colors"
-            fill={(hovered || value) >= i ? "#10B981" : "none"}
-            stroke={(hovered || value) >= i ? "#10B981" : "#D1D5DB"}
+            fill={active >= i ? "#10B981" : "none"}
+            stroke={active >= i ? "#10B981" : "#D1D5DB"}
           />
         </button>
       ))}
       {value > 0 && (
-        <span className="ml-1 text-xs text-emerald-600 dark:text-emerald-400 self-center font-medium">
+        <span className="ml-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium hidden sm:inline">
           {LABELS_PUAS[value - 1]}
         </span>
       )}
@@ -89,14 +89,17 @@ function SatisfactionInput({ fieldKey, value, onChange }: { fieldKey: string; va
   );
 }
 
-function QuestionGroup({
-  title, no, color, questions, values, onChange, InputComponent,
-}: {
-  title: string; no: string; color: string;
-  questions: { key: string; label: string }[];
-  values: Record<string, number>;
-  onChange: (k: string, v: number) => void;
-  InputComponent: typeof StarInput;
+function QuestionRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 border-b border-gray-50 dark:border-slate-700/30 last:border-0">
+      <p className="text-xs text-gray-700 dark:text-slate-300 flex-1 leading-snug">{label}</p>
+      <div className="shrink-0">{children}</div>
+    </div>
+  );
+}
+
+function SectionCard({ no, title, color, children }: {
+  no: string; title: string; color: string; children: React.ReactNode;
 }) {
   return (
     <div className="bg-white dark:bg-[#162133] rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm overflow-hidden">
@@ -104,24 +107,15 @@ function QuestionGroup({
         <span className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ backgroundColor: color }}>{no}</span>
         <h3 className="text-sm font-semibold text-[#0C2340] dark:text-white">{title}</h3>
       </div>
-      <div className="divide-y divide-gray-50 dark:divide-slate-700/30">
-        {questions.map((q) => (
-          <div key={q.key} className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-            <p className="text-xs text-gray-700 dark:text-slate-300 flex-1 leading-snug">{q.label}</p>
-            <div className="shrink-0">
-              <InputComponent fieldKey={q.key} value={values[q.key] ?? 0} onChange={(v) => onChange(q.key, v)} />
-            </div>
-          </div>
-        ))}
-      </div>
+      {children}
     </div>
   );
 }
 
 export default function KepuasanSection({ hideHeader = false }: { hideHeader?: boolean }) {
-  const [values, setValues] = useState<Record<string, number>>({});
   const [nama, setNama] = useState("");
-  const [instansi, setInstansi] = useState("");
+  const [values, setValues] = useState<Record<string, number>>({});
+  const [saran, setSaran] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -129,16 +123,19 @@ export default function KepuasanSection({ hideHeader = false }: { hideHeader?: b
   const allKeys = [...USABILITY, ...KONTEN, ...KEPUASAN].map((q) => q.key);
   const answered = allKeys.filter((k) => (values[k] ?? 0) > 0).length;
   const total = allKeys.length;
-  const allAnswered = answered === total;
 
   const handleChange = (k: string, v: number) => setValues((prev) => ({ ...prev, [k]: v }));
 
   const handleSubmit = async () => {
-    if (!allAnswered) { setError("Mohon isi semua pertanyaan sebelum mengirim."); return; }
+    if (answered < total) { setError("Mohon isi semua pertanyaan sebelum mengirim."); return; }
     setError("");
     setLoading(true);
     try {
-      await kepuasanApi.submit({ ...values, nama: nama || undefined, instansi: instansi || undefined });
+      await kepuasanApi.submit({
+        ...values,
+        nama: nama.trim() || undefined,
+        saran: saran.trim() || undefined,
+      });
       setSubmitted(true);
     } catch {
       setError("Gagal mengirim survei. Silakan coba lagi.");
@@ -167,7 +164,6 @@ export default function KepuasanSection({ hideHeader = false }: { hideHeader?: b
     <section className="bg-white dark:bg-[#0F1825] border-t border-slate-100 dark:border-slate-700/50 py-14">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
         {!hideHeader && (
           <div className="text-center mb-8">
             <span className="section-tag mb-2">Evaluasi Pengguna</span>
@@ -175,7 +171,7 @@ export default function KepuasanSection({ hideHeader = false }: { hideHeader?: b
               Survei Kepuasan Pengguna SITARA
             </h2>
             <p className="text-gray-500 dark:text-slate-400 text-sm max-w-xl mx-auto">
-              Bantu kami meningkatkan SITARA dengan mengisi survei singkat ini. Penilaian menggunakan skala bintang 1–5.
+              Bantu kami meningkatkan SITARA dengan mengisi survei singkat ini.
             </p>
           </div>
         )}
@@ -192,8 +188,22 @@ export default function KepuasanSection({ hideHeader = false }: { hideHeader?: b
           </p>
         </div>
 
+        {/* Nama — di paling atas */}
+        <div className="bg-gray-50 dark:bg-[#162133] rounded-xl border border-gray-100 dark:border-slate-700/50 px-5 py-4 mb-5">
+          <label className="block text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1.5">
+            Nama <span className="font-normal text-gray-400">(opsional)</span>
+          </label>
+          <input
+            type="text"
+            value={nama}
+            onChange={(e) => setNama(e.target.value)}
+            placeholder="Masukkan nama Anda"
+            className="w-full text-sm rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-[#0F1825] px-3 py-2 text-gray-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#1D6FCA]"
+          />
+        </div>
+
         {/* Progress */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-5">
           <div className="flex-1 h-1.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-[#1D6FCA] rounded-full transition-all duration-300"
@@ -203,67 +213,52 @@ export default function KepuasanSection({ hideHeader = false }: { hideHeader?: b
           <span className="text-xs text-gray-500 dark:text-slate-400 shrink-0">{answered}/{total} dijawab</span>
         </div>
 
-        {/* Section 3.1 */}
         <div className="space-y-4 mb-4">
-          <QuestionGroup
-            no="3.1" title="Kemudahan Penggunaan (Usability)" color="#1D6FCA"
-            questions={USABILITY} values={values} onChange={handleChange}
-            InputComponent={StarInput}
-          />
+          {/* 3.1 Kemudahan Penggunaan */}
+          <SectionCard no="3.1" title="Kemudahan Penggunaan (Usability)" color="#1D6FCA">
+            {USABILITY.map((q) => (
+              <QuestionRow key={q.key} label={q.label}>
+                <StarInput value={values[q.key] ?? 0} onChange={(v) => handleChange(q.key, v)} labels={LABELS_SETUJU} />
+              </QuestionRow>
+            ))}
+          </SectionCard>
 
-          {/* Section 3.2 */}
-          <QuestionGroup
-            no="3.2" title="Kelengkapan dan Kualitas Konten" color="#059669"
-            questions={KONTEN} values={values} onChange={handleChange}
-            InputComponent={StarInput}
-          />
+          {/* 3.2 Kelengkapan Konten */}
+          <SectionCard no="3.2" title="Kelengkapan dan Kualitas Konten" color="#059669">
+            {KONTEN.map((q) => (
+              <QuestionRow key={q.key} label={q.label}>
+                <StarInput value={values[q.key] ?? 0} onChange={(v) => handleChange(q.key, v)} labels={LABELS_SETUJU} />
+              </QuestionRow>
+            ))}
+          </SectionCard>
 
-          {/* Section 3.3 */}
-          <div className="bg-white dark:bg-[#162133] rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm overflow-hidden">
-            <div className="px-5 py-3.5 border-b border-gray-100 dark:border-slate-700/50 flex items-center gap-2.5">
-              <span className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold text-white shrink-0 bg-amber-500">3.3</span>
-              <h3 className="text-sm font-semibold text-[#0C2340] dark:text-white">Kepuasan Keseluruhan</h3>
+          {/* 3.3 Kepuasan Keseluruhan */}
+          <SectionCard no="3.3" title="Kepuasan Keseluruhan" color="#F59E0B">
+            {KEPUASAN.map((q) => (
+              <QuestionRow key={q.key} label={q.label}>
+                <SatisfactionInput value={values[q.key] ?? 0} onChange={(v) => handleChange(q.key, v)} />
+              </QuestionRow>
+            ))}
+          </SectionCard>
+
+          {/* 3.4 Saran */}
+          <SectionCard no="3.4" title="Saran dan Masukan" color="#6366F1">
+            <div className="px-5 py-4">
+              <p className="text-xs text-gray-600 dark:text-slate-300 mb-2 leading-snug">
+                Saran dan masukan lainnya untuk pengembangan SITARA ke depan
+              </p>
+              <textarea
+                value={saran}
+                onChange={(e) => setSaran(e.target.value)}
+                placeholder="Tuliskan saran atau masukan Anda di sini (opsional)..."
+                rows={4}
+                className="w-full text-sm rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-[#0F1825] px-3 py-2 text-gray-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#6366F1] resize-none"
+              />
             </div>
-            <div className="divide-y divide-gray-50 dark:divide-slate-700/30">
-              {KEPUASAN.map((q) => (
-                <div key={q.key} className="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  <p className="text-xs text-gray-700 dark:text-slate-300 flex-1 leading-snug">{q.label}</p>
-                  <div className="shrink-0">
-                    <SatisfactionInput fieldKey={q.key} value={values[q.key] ?? 0} onChange={(v) => handleChange(q.key, v)} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          </SectionCard>
         </div>
 
-        {/* Optional identity */}
-        <div className="bg-gray-50 dark:bg-[#162133] rounded-xl border border-gray-100 dark:border-slate-700/50 p-4 mb-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Nama (opsional)</label>
-            <input
-              type="text"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              placeholder="Nama Anda"
-              className="w-full text-xs rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-[#0F1825] px-3 py-2 text-gray-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#1D6FCA]"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Unit Kerja (opsional)</label>
-            <input
-              type="text"
-              value={instansi}
-              onChange={(e) => setInstansi(e.target.value)}
-              placeholder="Seksi / Bidang"
-              className="w-full text-xs rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-[#0F1825] px-3 py-2 text-gray-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#1D6FCA]"
-            />
-          </div>
-        </div>
-
-        {error && (
-          <p className="text-xs text-red-500 mb-3 text-center">{error}</p>
-        )}
+        {error && <p className="text-xs text-red-500 mb-3 text-center">{error}</p>}
 
         <div className="flex justify-center">
           <button

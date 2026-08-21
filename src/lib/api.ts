@@ -111,6 +111,8 @@ export const kepuasanApi = {
   submit: (data: Record<string, number | string | undefined>) => api.post('/kepuasan', data),
   getAll: () => api.get('/kepuasan'),
   getStats: () => api.get('/kepuasan/stats'),
+  update: (id: number, data: any) => api.put(`/kepuasan/${id}`, data),
+  delete: (id: number) => api.delete(`/kepuasan/${id}`),
 };
 
 export const indikatorBulananApi = {
