@@ -79,6 +79,7 @@ export default function AdminIndikatorPage() {
 
   const [uploadIndId, setUploadIndId] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadReplace, setUploadReplace] = useState(false);
   const [uploadResult, setUploadResult] = useState<{ inserted: number; errors: string[] } | null>(null);
   const [preview, setPreview] = useState<{ headers: string[]; rows: any[]; totalRows: number } | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -164,7 +165,7 @@ export default function AdminIndikatorPage() {
     setUploading(true);
     setUploadResult(null);
     try {
-      const res = await uploadApi.importCsv(selectedFile, uploadIndId);
+      const res = await uploadApi.importCsv(selectedFile, uploadIndId, undefined, uploadReplace);
       setUploadResult(res.data);
       setSelectedFile(null);
       setPreview(null);
@@ -413,7 +414,7 @@ export default function AdminIndikatorPage() {
                     <td className="py-3 px-4 text-gray-500 dark:text-slate-400 hidden md:table-cell">{ind.satuan}</td>
                     <td className="py-3 px-4">
                       <button
-                        onClick={() => { setUploadIndId(ind.id); setUploadResult(null); setPreview(null); setSelectedFile(null); setEditId(null); }}
+                        onClick={() => { setUploadIndId(ind.id); setUploadResult(null); setPreview(null); setSelectedFile(null); setUploadReplace(false); setEditId(null); }}
                         className="flex items-center gap-1.5 text-xs font-medium text-[#2196F3] hover:bg-blue-50 dark:hover:bg-blue-900/20 px-3 py-1.5 rounded-lg transition-colors"
                       >
                         <Upload className="w-3.5 h-3.5" /> Upload CSV
@@ -696,14 +697,27 @@ export default function AdminIndikatorPage() {
               </div>
             )}
 
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex items-center gap-4 flex-wrap">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={uploadReplace}
+                  onChange={(e) => setUploadReplace(e.target.checked)}
+                  className="w-4 h-4 accent-red-500"
+                />
+                <span className="text-xs text-gray-600 dark:text-slate-300">
+                  Hapus semua data lama sebelum import
+                </span>
+              </label>
               <button
                 onClick={handleImport}
                 disabled={!selectedFile || uploading}
-                className="flex items-center gap-2 bg-[#2196F3] text-white px-5 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+                className={`flex items-center gap-2 text-white px-5 py-2 rounded-lg text-sm font-medium disabled:opacity-50 ${
+                  uploadReplace ? "bg-red-500 hover:bg-red-600" : "bg-[#2196F3] hover:bg-blue-500"
+                } transition-colors`}
               >
                 {uploading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                {uploading ? "Mengimpor..." : "Import Sekarang"}
+                {uploading ? "Mengimpor..." : uploadReplace ? "Hapus & Import Ulang" : "Import Sekarang"}
               </button>
             </div>
           </div>

@@ -44,11 +44,14 @@ export const uploadApi = {
     form.append('file', file);
     return api.post('/upload/preview', form);
   },
-  importCsv: (file: File, indikatorId: number, kolom?: string) => {
+  importCsv: (file: File, indikatorId: number, kolom?: string, replace?: boolean) => {
     const form = new FormData();
     form.append('file', file);
-    const params = kolom ? `?kolom=${kolom}` : '';
-    return api.post(`/upload/csv/${indikatorId}${params}`, form);
+    const p = new URLSearchParams();
+    if (kolom) p.set('kolom', kolom);
+    if (replace) p.set('replace', 'true');
+    const qs = p.toString() ? `?${p}` : '';
+    return api.post(`/upload/csv/${indikatorId}${qs}`, form);
   },
 };
 
