@@ -43,6 +43,7 @@ export default function Footer() {
                 { href: "/portal-daerah", label: "Portal Daerah" },
                 { href: "/infografis", label: "Infografis" },
                 { href: "/layanan-konsultasi", label: "Layanan Konsultasi" },
+                { href: "/survei-kepuasan", label: "Survei Kepuasan" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
