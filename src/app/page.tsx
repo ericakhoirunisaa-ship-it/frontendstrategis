@@ -6,6 +6,7 @@ import JadwalRilisSection from "@/components/beranda/JadwalRilisSection";
 import TentangSection from "@/components/beranda/TentangSection";
 import LayananSection from "@/components/beranda/LayananSection";
 import InfografisSection from "@/components/beranda/InfografisSection";
+import KepuasanSection from "@/components/beranda/KepuasanSection";
 import VisitorCounter from "@/components/beranda/VisitorCounter";
 import HeroSearch from "@/components/beranda/HeroSearch";
 import HeroIllustration from "@/components/beranda/HeroIllustration";
@@ -122,6 +123,9 @@ export default function BerandaPage() {
 
       {/* ── LAYANAN ──────────────────────────────────────────── */}
       <LayananSection />
+
+      {/* ── SURVEI KEPUASAN ──────────────────────────────────── */}
+      <KepuasanSection />
 
       <Footer />
     </div>

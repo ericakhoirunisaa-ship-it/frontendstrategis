@@ -107,6 +107,12 @@ export const portalDaerahApi = {
   delete: (id: number) => api.delete(`/portal-daerah/${id}`),
 };
 
+export const kepuasanApi = {
+  submit: (data: Record<string, number | string | undefined>) => api.post('/kepuasan', data),
+  getAll: () => api.get('/kepuasan'),
+  getStats: () => api.get('/kepuasan/stats'),
+};
+
 export const indikatorBulananApi = {
   getAll: (bulan?: number, tahun?: number) => {
     const params = new URLSearchParams();
