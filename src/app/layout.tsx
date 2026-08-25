@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import TitleTicker from "@/components/TitleTicker";
+import MusicPlayer from "@/components/beranda/MusicPlayer";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <TitleTicker />
           {children}
+          <MusicPlayer />
         </ThemeProvider>
       </body>
     </html>

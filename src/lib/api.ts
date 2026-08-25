@@ -115,6 +115,21 @@ export const kepuasanApi = {
   delete: (id: number) => api.delete(`/kepuasan/${id}`),
 };
 
+export const quotesApi = {
+  getAll: (all = false) => api.get(`/quotes${all ? '?all=true' : ''}`),
+  create: (data: { teks: string; penulis?: string; urutan?: number }) => api.post('/quotes', data),
+  update: (id: number, data: { teks?: string; penulis?: string; urutan?: number; aktif?: boolean }) =>
+    api.put(`/quotes/${id}`, data),
+  delete: (id: number) => api.delete(`/quotes/${id}`),
+};
+
+export const musikApi = {
+  getAll: (all = false) => api.get(`/musik${all ? '?all=true' : ''}`),
+  create: (formData: FormData) => api.post('/musik', formData),
+  update: (id: number, data: { judul?: string; aktif?: boolean }) => api.put(`/musik/${id}`, data),
+  delete: (id: number) => api.delete(`/musik/${id}`),
+};
+
 export const indikatorBulananApi = {
   getAll: (bulan?: number, tahun?: number) => {
     const params = new URLSearchParams();

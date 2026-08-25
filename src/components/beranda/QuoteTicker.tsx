@@ -1,33 +1,44 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Quote } from "lucide-react";
+import { quotesApi } from "@/lib/api";
 
-const QUOTES = [
-  { text: "Data adalah fondasi dari setiap keputusan yang bijak.", author: "BPS RI" },
-  { text: "Statistik bukan sekadar angka — ia adalah cermin realita.", author: "Prinsip Statistik" },
-  { text: "Pembangunan yang baik berawal dari data yang akurat.", author: "Visi BPS" },
-  { text: "Satu data yang benar lebih berharga dari seribu asumsi.", author: "Motto Statistisi" },
-  { text: "Keputusan tanpa data hanyalah tebakan yang memakai jas.", author: "W. Edwards Deming" },
-  { text: "Mengukur berarti memahami, memahami berarti mampu mengubah.", author: "Prinsip Manajemen" },
-  { text: "Angka bercerita — tugas kita adalah mendengarkannya.", author: "BPS Kab. Toli-Toli" },
+const FALLBACK = [
+  { teks: "Data adalah fondasi dari setiap keputusan yang bijak.", penulis: "BPS RI" },
+  { teks: "Statistik bukan sekadar angka — ia adalah cermin realita.", penulis: "Prinsip Statistik" },
+  { teks: "Pembangunan yang baik berawal dari data yang akurat.", penulis: "Visi BPS" },
+  { teks: "Satu data yang benar lebih berharga dari seribu asumsi.", penulis: "Motto Statistisi" },
+  { teks: "Keputusan tanpa data hanyalah tebakan yang memakai jas.", penulis: "W. Edwards Deming" },
+  { teks: "Angka bercerita — tugas kita adalah mendengarkannya.", penulis: "BPS Kab. Toli-Toli" },
 ];
 
+interface QuoteItem { id?: number; teks: string; penulis: string; }
+
 export default function QuoteTicker() {
+  const [quotes, setQuotes] = useState<QuoteItem[]>(FALLBACK);
   const [idx, setIdx] = useState(0);
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
+    quotesApi.getAll().then((r) => {
+      if (r.data?.length) setQuotes(r.data);
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (quotes.length <= 1) return;
     const timer = setInterval(() => {
       setVisible(false);
       setTimeout(() => {
-        setIdx((i) => (i + 1) % QUOTES.length);
+        setIdx((i) => (i + 1) % quotes.length);
         setVisible(true);
       }, 400);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [quotes]);
 
-  const q = QUOTES[idx];
+  const q = quotes[idx] ?? quotes[0];
+  if (!q) return null;
 
   return (
     <div className="bg-[#0A1E35] border-b border-white/8">
@@ -37,12 +48,11 @@ export default function QuoteTicker() {
           className="text-white/55 text-xs leading-relaxed transition-opacity duration-400"
           style={{ opacity: visible ? 1 : 0 }}
         >
-          <span className="text-white/80 italic">&ldquo;{q.text}&rdquo;</span>
-          <span className="text-white/30 ml-2">— {q.author}</span>
+          <span className="text-white/80 italic">&ldquo;{q.teks}&rdquo;</span>
+          <span className="text-white/30 ml-2">— {q.penulis}</span>
         </p>
-        {/* Dot indicators */}
         <div className="ml-auto flex gap-1 shrink-0">
-          {QUOTES.map((_, i) => (
+          {quotes.map((_, i) => (
             <button
               key={i}
               onClick={() => { setVisible(false); setTimeout(() => { setIdx(i); setVisible(true); }, 300); }}

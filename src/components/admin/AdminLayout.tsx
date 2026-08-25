@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, LayoutDashboard, Database, Calendar, BarChart2, LogOut, Menu, X, ImageIcon, MessageSquareWarning, Sun, Moon, Map, TrendingUp, Building2, Star } from "lucide-react";
+import { BarChart3, LayoutDashboard, Database, Calendar, BarChart2, LogOut, Menu, X, ImageIcon, MessageSquareWarning, Sun, Moon, Map, TrendingUp, Building2, Star, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 
@@ -16,6 +16,7 @@ const navItems = [
   { href: "/admin/peta-tematik", icon: Map, label: "Peta Tematik" },
   { href: "/admin/pengaduan", icon: MessageSquareWarning, label: "Pengaduan" },
   { href: "/admin/kepuasan", icon: Star, label: "Survei Kepuasan" },
+  { href: "/admin/konten", icon: Sparkles, label: "Quotes & Musik" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
