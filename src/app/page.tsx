@@ -84,12 +84,9 @@ export default function BerandaPage() {
           </div>
         </div>
 
-        {/* Clean bottom border instead of wave */}
-        <div className="h-px bg-white/10" />
+        {/* Quote ticker — di dalam hero */}
+        <QuoteTicker />
       </section>
-
-      {/* ── QUOTE TICKER ─────────────────────────────────────── */}
-      <QuoteTicker />
 
       {/* ── STATISTIK UTAMA ───────────────────────────────────── */}
       <section className="bg-white dark:bg-[#0F1825] border-b border-slate-100 dark:border-slate-700/50 py-12">

@@ -52,14 +52,9 @@ export default function KilasDataSection() {
         {/* Header */}
         <div className="mb-10">
           <span className="section-tag mb-3">Kilas Data Strategis</span>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white leading-tight">
-              Temukan Data yang Anda Butuhkan
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs leading-relaxed">
-              Akses berbagai data statistik resmi Kabupaten Toli-Toli melalui layanan yang tersedia.
-            </p>
-          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#0C2340] dark:text-white leading-tight">
+            Temukan Data yang Anda Butuhkan
+          </h2>
         </div>
 
         {/* Cards */}
