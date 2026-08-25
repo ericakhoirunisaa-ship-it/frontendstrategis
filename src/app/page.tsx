@@ -20,6 +20,8 @@ export default function BerandaPage() {
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="bg-[#0C2340]">
+        {/* Quote ticker — paling atas hero, tepat di bawah navbar */}
+        <QuoteTicker />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
 
@@ -84,8 +86,6 @@ export default function BerandaPage() {
           </div>
         </div>
 
-        {/* Quote ticker — di dalam hero */}
-        <QuoteTicker />
       </section>
 
       {/* ── STATISTIK UTAMA ───────────────────────────────────── */}
