@@ -9,6 +9,7 @@ import InfografisSection from "@/components/beranda/InfografisSection";
 import VisitorCounter from "@/components/beranda/VisitorCounter";
 import HeroSearch from "@/components/beranda/HeroSearch";
 import HeroIllustration from "@/components/beranda/HeroIllustration";
+import QuoteTicker from "@/components/beranda/QuoteTicker";
 import Link from "next/link";
 import { ArrowRight, Shield, Database, BarChart3 } from "lucide-react";
 
@@ -86,6 +87,9 @@ export default function BerandaPage() {
         {/* Clean bottom border instead of wave */}
         <div className="h-px bg-white/10" />
       </section>
+
+      {/* ── QUOTE TICKER ─────────────────────────────────────── */}
+      <QuoteTicker />
 
       {/* ── STATISTIK UTAMA ───────────────────────────────────── */}
       <section className="bg-white dark:bg-[#0F1825] border-b border-slate-100 dark:border-slate-700/50 py-12">
