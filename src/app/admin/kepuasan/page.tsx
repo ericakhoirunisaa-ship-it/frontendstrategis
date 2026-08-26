@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Star, Users, BarChart2, FileDown, RefreshCw, Inbox, Trash2, Pencil, X, Check } from "lucide-react";
+import { Star, Users, BarChart2, FileDown, RefreshCw, Inbox, Trash2, Pencil, X, Check, FileSpreadsheet } from "lucide-react";
 import { kepuasanApi } from "@/lib/api";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 // ── Label pertanyaan ─────────────────────────────────────────
 const U_LABELS = [
@@ -190,6 +193,91 @@ export default function KepuasanPage() {
     return (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
   };
 
+  const tglExport = () => new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+
+  const exportExcel = () => {
+    const wb = XLSX.utils.book_new();
+
+    // Sheet 1 – Ringkasan
+    const summary: any[][] = [
+      ["HASIL SURVEI KEPUASAN PENGGUNA SITARA"],
+      ["Tanggal Export", tglExport()],
+      ["Total Responden", rows.length],
+      [],
+      ["RATA-RATA PER ASPEK"],
+      ["Aspek", "Rata-rata (dari 5,00)"],
+      ["Kemudahan Penggunaan (Usability)", stats ? Number(stats.avgU.toFixed(2)) : "-"],
+      ["Kelengkapan & Kualitas Konten",    stats ? Number(stats.avgK.toFixed(2)) : "-"],
+      ["Kepuasan Keseluruhan",             stats ? Number(stats.avgS.toFixed(2)) : "-"],
+      [],
+      ["DETAIL RATA-RATA PER PERTANYAAN"],
+      ["Kode", "Pertanyaan", "Rata-rata"],
+      ...U_LABELS.map((l, i) => [`U${i+1}`, l, stats ? Number((stats.usability[`u${i+1}`] ?? 0).toFixed(2)) : "-"]),
+      ...K_LABELS.map((l, i) => [`K${i+1}`, l, stats ? Number((stats.konten[`k${i+1}`] ?? 0).toFixed(2)) : "-"]),
+      ...S_LABELS.map((l, i) => [`S${i+1}`, l, stats ? Number((stats.kepuasan[`s${i+1}`] ?? 0).toFixed(2)) : "-"]),
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), "Ringkasan");
+
+    // Sheet 2 – Data Responden
+    const header = ["No","Nama","U1","U2","U3","U4","U5","K1","K2","K3","K4","K5","S1","S2","S3","S4","Avg Usability","Avg Konten","Avg Kepuasan","Avg Total","Saran","Tanggal"];
+    const dataRows = rows.map((r, i) => [
+      i + 1,
+      r.nama || "",
+      r.u1, r.u2, r.u3, r.u4, r.u5,
+      r.k1, r.k2, r.k3, r.k4, r.k5,
+      r.s1, r.s2, r.s3, r.s4,
+      Number(((r.u1+r.u2+r.u3+r.u4+r.u5)/5).toFixed(2)),
+      Number(((r.k1+r.k2+r.k3+r.k4+r.k5)/5).toFixed(2)),
+      Number(((r.s1+r.s2+r.s3+r.s4)/4).toFixed(2)),
+      Number(avgRow(r)),
+      r.saran || "",
+      new Date(r.createdAt).toLocaleDateString("id-ID"),
+    ]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([header, ...dataRows]), "Data Responden");
+
+    XLSX.writeFile(wb, `survei-kepuasan-sitara-${new Date().toISOString().slice(0,10)}.xlsx`);
+  };
+
+  const exportPDF = () => {
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Hasil Survei Kepuasan Pengguna SITARA", 14, 16);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100);
+    doc.text(`Tanggal export: ${tglExport()}  ·  Total responden: ${rows.length}`, 14, 22);
+    if (stats) {
+      doc.text(
+        `Usability: ${stats.avgU.toFixed(2)}   Konten: ${stats.avgK.toFixed(2)}   Kepuasan: ${stats.avgS.toFixed(2)}`,
+        14, 27,
+      );
+    }
+    doc.setTextColor(0);
+
+    autoTable(doc, {
+      startY: 32,
+      head: [["No","Nama","Avg Usability","Avg Konten","Avg Kepuasan","Avg Total","Saran","Tanggal"]],
+      body: rows.map((r, i) => [
+        i + 1,
+        r.nama || "—",
+        ((r.u1+r.u2+r.u3+r.u4+r.u5)/5).toFixed(2),
+        ((r.k1+r.k2+r.k3+r.k4+r.k5)/5).toFixed(2),
+        ((r.s1+r.s2+r.s3+r.s4)/4).toFixed(2),
+        avgRow(r),
+        r.saran || "—",
+        new Date(r.createdAt).toLocaleDateString("id-ID"),
+      ]),
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [29, 111, 202], textColor: 255, fontStyle: "bold" },
+      alternateRowStyles: { fillColor: [245, 248, 255] },
+      columnStyles: { 6: { cellWidth: 60 } },
+    });
+
+    doc.save(`survei-kepuasan-sitara-${new Date().toISOString().slice(0,10)}.pdf`);
+  };
+
   return (
     <AdminLayout>
       {editRow && (
@@ -210,9 +298,31 @@ export default function KepuasanPage() {
               </p>
             </div>
           </div>
-          <button onClick={load} className="shrink-0 p-2 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            {rows.length > 0 && (
+              <>
+                <button
+                  onClick={exportExcel}
+                  title="Ekspor Excel"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40 transition-colors"
+                >
+                  <FileSpreadsheet className="w-3.5 h-3.5" />
+                  Excel
+                </button>
+                <button
+                  onClick={exportPDF}
+                  title="Ekspor PDF"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition-colors"
+                >
+                  <FileDown className="w-3.5 h-3.5" />
+                  PDF
+                </button>
+              </>
+            )}
+            <button onClick={load} className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
