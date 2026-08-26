@@ -3,19 +3,10 @@ import { useState, useEffect } from "react";
 import { Quote } from "lucide-react";
 import { quotesApi } from "@/lib/api";
 
-const FALLBACK = [
-  { teks: "Data adalah fondasi dari setiap keputusan yang bijak.", penulis: "BPS RI" },
-  { teks: "Statistik bukan sekadar angka — ia adalah cermin realita.", penulis: "Prinsip Statistik" },
-  { teks: "Pembangunan yang baik berawal dari data yang akurat.", penulis: "Visi BPS" },
-  { teks: "Satu data yang benar lebih berharga dari seribu asumsi.", penulis: "Motto Statistisi" },
-  { teks: "Keputusan tanpa data hanyalah tebakan yang memakai jas.", penulis: "W. Edwards Deming" },
-  { teks: "Angka bercerita — tugas kita adalah mendengarkannya.", penulis: "BPS Kab. Toli-Toli" },
-];
-
 interface QuoteItem { id?: number; teks: string; penulis: string; }
 
 export default function QuoteTicker() {
-  const [quotes, setQuotes] = useState<QuoteItem[]>(FALLBACK);
+  const [quotes, setQuotes] = useState<QuoteItem[]>([]);
   const [idx, setIdx] = useState(0);
   const [visible, setVisible] = useState(true);
 
