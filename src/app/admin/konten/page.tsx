@@ -2,7 +2,14 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useEffect, useState, useRef } from "react";
 import { quotesApi, musikApi } from "@/lib/api";
-import { Plus, Trash2, Loader2, CheckCircle, AlertCircle, X, Upload, Music, Quote, Pencil, Check } from "lucide-react";
+import { Plus, Trash2, Loader2, CheckCircle, AlertCircle, Upload, Music, Quote, Pencil } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http://localhost:3001";
 
@@ -16,6 +23,7 @@ export default function AdminKontenPage() {
   const [quotes, setQuotes] = useState<QuoteItem[]>([]);
   const [qForm, setQForm] = useState({ teks: "", penulis: "BPS Kab. Toli-Toli", urutan: "0" });
   const [qEditing, setQEditing] = useState<QuoteItem | null>(null);
+  const [qModalOpen, setQModalOpen] = useState(false);
   const [qLoading, setQLoading] = useState(false);
   const [qMsg, setQMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
@@ -58,10 +66,27 @@ export default function AdminKontenPage() {
     } catch { flash(setQMsg, "err", "Gagal mengupdate"); }
   };
 
+  const openEditModal = (q: QuoteItem) => {
+    setQEditing({ ...q });
+    setQModalOpen(true);
+  };
+
   const handleSaveEdit = async () => {
     if (!qEditing) return;
-    await handleUpdateQuote(qEditing, { teks: qEditing.teks, penulis: qEditing.penulis });
-    setQEditing(null);
+    setQLoading(true);
+    try {
+      await quotesApi.update(qEditing.id, {
+        teks: qEditing.teks,
+        penulis: qEditing.penulis,
+        urutan: qEditing.urutan,
+      });
+      loadQuotes();
+      setQModalOpen(false);
+      flash(setQMsg, "ok", "Quote berhasil diupdate");
+    } catch {
+      flash(setQMsg, "err", "Gagal mengupdate quote");
+    }
+    setQLoading(false);
   };
 
   const handleDeleteQuote = async (id: number) => {
@@ -196,45 +221,18 @@ export default function AdminKontenPage() {
                 <div key={q.id} className={`bg-white dark:bg-[#162133] rounded-xl border px-4 py-3 flex items-start gap-3 transition-all ${q.aktif ? "border-gray-100 dark:border-slate-700/50" : "border-slate-200 opacity-50"}`}>
                   <Quote className="w-4 h-4 text-[#38BDF8] shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
-                    {qEditing?.id === q.id ? (
-                      <div className="space-y-2">
-                        <textarea
-                          value={qEditing.teks}
-                          onChange={(e) => setQEditing({ ...qEditing, teks: e.target.value })}
-                          rows={2}
-                          className="w-full px-2 py-1.5 rounded-lg border border-blue-300 text-sm focus:outline-none resize-none dark:bg-slate-800 dark:text-white"
-                        />
-                        <input
-                          value={qEditing.penulis}
-                          onChange={(e) => setQEditing({ ...qEditing, penulis: e.target.value })}
-                          className="w-full px-2 py-1.5 rounded-lg border border-blue-300 text-sm focus:outline-none dark:bg-slate-800 dark:text-white"
-                        />
-                      </div>
-                    ) : (
-                      <>
-                        <p className="text-sm text-[#0C2340] dark:text-white italic">&ldquo;{q.teks}&rdquo;</p>
-                        <p className="text-xs text-gray-400 mt-0.5">— {q.penulis} · Urutan: {q.urutan}</p>
-                      </>
-                    )}
+                    <p className="text-sm text-[#0C2340] dark:text-white italic">&ldquo;{q.teks}&rdquo;</p>
+                    <p className="text-xs text-gray-400 mt-0.5">— {q.penulis} · Urutan: {q.urutan}</p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    {qEditing?.id === q.id ? (
-                      <>
-                        <button onClick={handleSaveEdit} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg"><Check className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => setQEditing(null)} className="p-1.5 text-gray-400 hover:bg-gray-50 rounded-lg"><X className="w-3.5 h-3.5" /></button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => handleUpdateQuote(q, { aktif: !q.aktif })}
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${q.aktif ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"}`}
-                        >
-                          {q.aktif ? "Aktif" : "Nonaktif"}
-                        </button>
-                        <button onClick={() => setQEditing(q)} className="p-1.5 text-gray-400 hover:text-blue-500 rounded-lg"><Pencil className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => handleDeleteQuote(q.id)} className="p-1.5 text-gray-300 hover:text-red-500 rounded-lg"><Trash2 className="w-3.5 h-3.5" /></button>
-                      </>
-                    )}
+                    <button
+                      onClick={() => handleUpdateQuote(q, { aktif: !q.aktif })}
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${q.aktif ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-500"}`}
+                    >
+                      {q.aktif ? "Aktif" : "Nonaktif"}
+                    </button>
+                    <button onClick={() => openEditModal(q)} className="p-1.5 text-gray-400 hover:text-blue-500 rounded-lg" title="Edit"><Pencil className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => handleDeleteQuote(q.id)} className="p-1.5 text-gray-300 hover:text-red-500 rounded-lg" title="Hapus"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
               ))}
@@ -340,6 +338,62 @@ export default function AdminKontenPage() {
           </div>
         )}
       </div>
+      {/* ── MODAL EDIT QUOTE ── */}
+      <Dialog open={qModalOpen} onOpenChange={setQModalOpen}>
+        <DialogContent className="max-w-lg dark:bg-[#162133]">
+          <DialogHeader>
+            <DialogTitle className="text-[#0C2340] dark:text-white">Edit Quote</DialogTitle>
+          </DialogHeader>
+          {qEditing && (
+            <div className="space-y-4 py-1">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Teks Quote *</label>
+                <textarea
+                  value={qEditing.teks}
+                  onChange={(e) => setQEditing({ ...qEditing, teks: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Penulis / Sumber</label>
+                  <input
+                    value={qEditing.penulis}
+                    onChange={(e) => setQEditing({ ...qEditing, penulis: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Urutan Tampil</label>
+                  <input
+                    type="number"
+                    value={qEditing.urutan}
+                    onChange={(e) => setQEditing({ ...qEditing, urutan: Number(e.target.value) })}
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="border-t-0 bg-transparent px-0 pb-0">
+            <button
+              onClick={() => setQModalOpen(false)}
+              className="px-4 py-2 rounded-xl border border-gray-200 text-sm text-gray-500 hover:bg-gray-50 dark:border-slate-600 dark:hover:bg-slate-700"
+            >
+              Batal
+            </button>
+            <button
+              onClick={handleSaveEdit}
+              disabled={qLoading || !qEditing?.teks?.trim()}
+              className="flex items-center gap-2 bg-[#1D6FCA] text-white px-5 py-2 rounded-xl text-sm font-semibold disabled:opacity-50"
+            >
+              {qLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+              Simpan Perubahan
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }
