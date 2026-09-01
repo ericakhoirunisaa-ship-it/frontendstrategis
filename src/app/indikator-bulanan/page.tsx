@@ -71,19 +71,6 @@ function computeCardH(
   return Math.max(18, Math.min(40, raw));
 }
 
-async function loadImageDataUrl(src: string): Promise<string | null> {
-  try {
-    const res = await fetch(src);
-    const blob = await res.blob();
-    return await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch { return null; }
-}
-
 // ── PDF Download ──────────────────────────────────────────────────────────────
 
 async function downloadRingkasanPDF(
@@ -100,69 +87,22 @@ async function downloadRingkasanPDF(
     parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16),
   ];
 
-  const logoDataUrl = await loadImageDataUrl("/bps-logo.jpg");
-
-  // ── Header band (biru gelap) ────────────────────────────────
-  pdf.setFillColor(0, 40, 120);
-  pdf.rect(0, 0, pw, 28, "F");
-  // Aksen oranye kanan
-  pdf.setFillColor(234, 88, 12);
-  pdf.rect(pw - 4, 0, 4, 28, "F");
-  // Logo BPS
-  if (logoDataUrl) pdf.addImage(logoDataUrl, "JPEG", ml, 4, 20, 20);
-  // Teks BPS (putih)
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(8.5);
-  pdf.text("BADAN PUSAT STATISTIK", ml + 23, 12);
-  pdf.setFontSize(7.5);
-  pdf.setFont("helvetica", "normal");
-  pdf.text("KABUPATEN TOLI-TOLI", ml + 23, 19);
-
   // ── Judul ──────────────────────────────────────────────────
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(18);
   pdf.setTextColor(234, 88, 12);
-  pdf.text("RINGKASAN INDIKATOR STRATEGIS", pw / 2, 38, { align: "center" });
+  pdf.text("RINGKASAN INDIKATOR STRATEGIS", pw / 2, 14, { align: "center" });
   pdf.setFontSize(11);
   pdf.setTextColor(0, 40, 120);
-  pdf.text("KABUPATEN TOLI-TOLI", pw / 2, 45, { align: "center" });
+  pdf.text("KABUPATEN TOLI-TOLI", pw / 2, 21, { align: "center" });
   // Garis dekoratif oranye
   pdf.setDrawColor(234, 88, 12);
   pdf.setLineWidth(0.8);
-  pdf.line(pw / 2 - 38, 48, pw / 2 + 38, 48);
-
-  // ── Footer ─────────────────────────────────────────────────
-  const drawFooter = () => {
-    const fy = ph - 20;
-    // Background oranye muda
-    pdf.setFillColor(255, 237, 213);
-    pdf.setDrawColor(251, 146, 60);
-    pdf.setLineWidth(0.4);
-    pdf.roundedRect(ml, fy, cw, 13, 2, 2, "FD");
-    // Aksen oranye kiri
-    pdf.setFillColor(234, 88, 12);
-    pdf.roundedRect(ml, fy, 3, 13, 1, 1, "F");
-    pdf.setFont("helvetica", "bold"); pdf.setFontSize(7.5); pdf.setTextColor(154, 52, 18);
-    pdf.text("Informasi lebih lanjut kunjungi:", ml + 6, fy + 5.5);
-    pdf.setFont("helvetica", "normal"); pdf.setFontSize(7); pdf.setTextColor(29, 78, 180);
-    pdf.text("https://strategis7206.zeabur.app/", ml + 6, fy + 10.5);
-    pdf.text("https://tolitolikab.bps.go.id/id", pw / 2 + 4, fy + 10.5);
-    // Titik warna + website
-    const dy = ph - 4;
-    ([
-      [0, 40, 120], [234, 88, 12], [5, 150, 105],
-    ] as [number,number,number][]).forEach(([r, g, b], i) => {
-      pdf.setFillColor(r, g, b);
-      pdf.circle(ml + i * 6, dy, 1.8, "F");
-    });
-    pdf.setFont("helvetica", "bold"); pdf.setFontSize(8.5); pdf.setTextColor(50, 50, 50);
-    pdf.text("tolitolikab.bps.go.id", pw - mr, dy + 1.2, { align: "right" });
-  };
+  pdf.line(pw / 2 - 38, 24, pw / 2 + 38, 24);
 
   // ── Layout ─────────────────────────────────────────────────
   const grouped = buildGrouped(items, bulan, tahun);
-  const cardsStart = 52, footerTop = ph - 23;
+  const cardsStart = 29, footerTop = ph - 5;
   const labelH = 9, gapAfterLabel = 3, interGroupGap = 6, gapX = 5, gapY = 3;
   const cardHmm = computeCardH(grouped, footerTop - cardsStart, labelH, gapAfterLabel, interGroupGap, gapY);
   const cardW = (cw - gapX) / 2;
@@ -214,7 +154,7 @@ async function downloadRingkasanPDF(
 
     if (item.satuan) {
       pdf.setFont("helvetica", "normal"); pdf.setFontSize(satuanFsz); pdf.setTextColor(120, 120, 120);
-      pdf.text(item.satuan, x + 3 + pdf.getTextWidth(item.nilai) + 1, valY - 0.5);
+      pdf.text(item.satuan, x + 3 + pdf.getTextWidth(item.nilai) + 2.5, valY - 0.5);
     }
 
     const chY = bodyTop + bodyH * 0.87;
@@ -260,7 +200,6 @@ async function downloadRingkasanPDF(
     y += cardHmm + (gi < grouped.length - 1 ? interGroupGap : 0);
   }
 
-  drawFooter();
   pdf.save(`Ringkasan-Indikator-Strategis-${BULAN_LABEL[bulan]}-${tahun}.pdf`);
 }
 
@@ -331,45 +270,8 @@ async function downloadRingkasanPNG(
 
   const PAD = p(12), cw = CW - PAD * 2;
 
-  // ── Load logo ─────────────────────────────────────────
-  let logoImg: HTMLImageElement | null = null;
-  try {
-    logoImg = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img); img.onerror = reject;
-      img.src = "/bps-logo.jpg";
-    });
-  } catch { /* fallback */ }
-
-  // ── Header band biru ──────────────────────────────────
-  const BAND_H = p(30);
-  const grad = ctx.createLinearGradient(0, 0, CW, 0);
-  grad.addColorStop(0, "#002888"); grad.addColorStop(1, "#0052A5");
-  ctx.fillStyle = grad; ctx.fillRect(0, 0, CW, BAND_H);
-  // Aksen oranye kanan
-  ctx.fillStyle = "#EA580C"; ctx.fillRect(CW - p(5), 0, p(5), BAND_H);
-  // Aksen putih tipis bawah
-  ctx.fillStyle = "rgba(255,255,255,0.15)"; ctx.fillRect(0, BAND_H - p(0.5), CW, p(0.5));
-
-  // Logo
-  const LOGO = p(22);
-  if (logoImg) {
-    // Lingkaran putih di belakang logo
-    ctx.beginPath(); ctx.arc(PAD + LOGO/2, BAND_H/2, LOGO/2 + p(1.5), 0, Math.PI*2);
-    ctx.fillStyle = "rgba(255,255,255,0.18)"; ctx.fill();
-    ctx.drawImage(logoImg, PAD, (BAND_H - LOGO) / 2, LOGO, LOGO);
-  }
-  // Teks BPS
-  ctx.fillStyle = "#FFFFFF"; ctx.textBaseline = "middle";
-  ctx.font = `bold ${pt(9)}px Arial, sans-serif`;
-  ctx.fillText("BADAN PUSAT STATISTIK", PAD + LOGO + p(4), BAND_H * 0.35);
-  ctx.font = `${pt(8)}px Arial, sans-serif`;
-  ctx.fillStyle = "rgba(255,255,255,0.82)";
-  ctx.fillText("KABUPATEN TOLI-TOLI", PAD + LOGO + p(4), BAND_H * 0.68);
-  ctx.textBaseline = "alphabetic";
-
   // ── Judul ─────────────────────────────────────────────
-  const TITLE_TOP = BAND_H + p(6);
+  const TITLE_TOP = p(8);
   ctx.textAlign = "center";
   ctx.font = `bold ${pt(20)}px Arial, sans-serif`;
   ctx.fillStyle = "#EA580C";
@@ -389,7 +291,7 @@ async function downloadRingkasanPNG(
   const grouped = buildGrouped(items, bulan, tahun);
   const LABEL_H  = p(9),  GAP_AL  = p(3), IG_GAP = p(6);
   const GAP_X    = p(5),  GAP_Y   = p(3);
-  const FOOTER_TOP = p(274);
+  const FOOTER_TOP = p(288);
 
   const cardHmm = computeCardH(grouped, (FOOTER_TOP - CARDS_START) / MM, 9, 3, 6, 3);
   const CARD_H  = p(cardHmm);
@@ -444,7 +346,7 @@ async function downloadRingkasanPNG(
       ctx.font = `${pt(6.5)}px Arial, sans-serif`;
       ctx.fillStyle = "#888";
       ctx.textBaseline = "bottom";
-      ctx.fillText(item.satuan, x + p(3) + vw + p(1), valY);
+      ctx.fillText(item.satuan, x + p(3) + vw + p(2.5), valY);
       ctx.textBaseline = "alphabetic";
     }
 
@@ -506,36 +408,6 @@ async function downloadRingkasanPNG(
     }
     y += CARD_H + (gi < grouped.length - 1 ? IG_GAP : 0);
   }
-
-  // ── Footer ────────────────────────────────────────────
-  const FY = p(275), FH = p(15);
-  // Footer box oranye
-  setShadow(p(3), "rgba(0,0,0,0.10)", -p(1));
-  rrPath(PAD, FY, cw, FH, p(3));
-  const fgrad = ctx.createLinearGradient(PAD, FY, PAD + cw, FY);
-  fgrad.addColorStop(0, "#FFEDD5"); fgrad.addColorStop(1, "#FEF3C7");
-  ctx.fillStyle = fgrad; ctx.fill();
-  clearShadow();
-  rrPath(PAD, FY, cw, FH, p(3));
-  ctx.strokeStyle = "#FB923C"; ctx.lineWidth = p(0.4); ctx.stroke();
-  // Aksen kiri
-  ctx.fillStyle = "#EA580C"; ctx.fillRect(PAD, FY + p(2), p(3.5), FH - p(4));
-
-  ctx.font = `bold ${pt(8)}px Arial, sans-serif`; ctx.fillStyle = "#9A3412";
-  ctx.fillText("Informasi lebih lanjut kunjungi:", PAD + p(7), FY + FH * 0.40);
-  ctx.font = `${pt(7.5)}px Arial, sans-serif`; ctx.fillStyle = "#1D4ED8";
-  ctx.fillText("https://strategis7206.zeabur.app/", PAD + p(7), FY + FH * 0.78);
-  ctx.fillText("https://tolitolikab.bps.go.id/id", PAD + cw/2 + p(3), FY + FH * 0.78);
-
-  // Titik warna + nama website
-  const DY = p(294);
-  [[0,40,120],[234,88,12],[5,150,105]].forEach(([r,g,b],i) => {
-    ctx.beginPath(); ctx.arc(PAD + p(i * 7 + 2), DY, p(2.2), 0, Math.PI * 2);
-    ctx.fillStyle = `rgb(${r},${g},${b})`; ctx.fill();
-  });
-  ctx.textAlign = "right"; ctx.font = `bold ${pt(9)}px Arial, sans-serif`; ctx.fillStyle = "#1F2937";
-  ctx.fillText("tolitolikab.bps.go.id", CW - PAD, DY + p(2));
-  ctx.textAlign = "left";
 
   // ── Ekspor PNG ────────────────────────────────────────
   canvas.toBlob((blob) => {
