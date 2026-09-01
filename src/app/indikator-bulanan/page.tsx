@@ -151,10 +151,11 @@ async function downloadRingkasanPDF(
     const valY = bodyTop + bodyH * 0.56;
     pdf.setFont("helvetica", "bold"); pdf.setFontSize(valueFsz); pdf.setTextColor(10, 30, 80);
     pdf.text(item.nilai, x + 3, valY);
+    const nilaiW = pdf.getTextWidth(item.nilai);
 
     if (item.satuan) {
       pdf.setFont("helvetica", "normal"); pdf.setFontSize(satuanFsz); pdf.setTextColor(120, 120, 120);
-      pdf.text(item.satuan, x + 3 + pdf.getTextWidth(item.nilai) + 2.5, valY - 0.5);
+      pdf.text(item.satuan, x + 3 + nilaiW + 2.5, valY - 0.5);
     }
 
     const chY = bodyTop + bodyH * 0.87;
