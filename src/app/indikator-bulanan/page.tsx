@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { indikatorBulananApi } from "@/lib/api";
-import { TrendingUp, TrendingDown, Minus, BarChart2, ChevronLeft, ChevronRight, Zap, FileText, Image as ImageIcon } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, BarChart2, ChevronLeft, ChevronRight, FileText, Image as ImageIcon } from "lucide-react";
 
 interface IndikatorBulanan {
   id: number;
@@ -426,27 +426,13 @@ function StatCard({ item }: { item: IndikatorBulanan }) {
   const w = WARNA_MAP[item.warna] ?? WARNA_MAP.biru;
   const naik = item.arahPerubahan === "naik";
   const turun = item.arahPerubahan === "turun";
-  const isAuto = item.sumber === "strategis";
-
   return (
     <div
-      className="rounded-2xl overflow-hidden shadow-sm border transition-all hover:-translate-y-0.5 hover:shadow-md relative"
+      className="rounded-2xl overflow-hidden shadow-sm border transition-all hover:-translate-y-0.5 hover:shadow-md"
       style={{ borderColor: w.border, background: w.soft }}
     >
-      {/* Auto badge */}
-      {isAuto && (
-        <span
-          className="absolute top-2 right-2 z-10 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
-          style={{ background: "rgba(255,255,255,0.85)", color: w.bg }}
-          title="Data otomatis dari Indikator Strategis"
-        >
-          <Zap className="w-2.5 h-2.5" />
-          Auto
-        </span>
-      )}
-
       {/* Colored header */}
-      <div className="px-4 py-3 pr-14" style={{ background: w.bg }}>
+      <div className="px-4 py-3" style={{ background: w.bg }}>
         <p className="text-white/80 text-[11px] font-semibold uppercase tracking-wider line-clamp-2 leading-tight">
           {item.judul}
         </p>
@@ -583,8 +569,6 @@ export default function IndikatorBulananPage() {
   };
 
   const tahunOptions = availTahun.length > 0 ? availTahun : [tahun];
-  const autoCount = items.filter((i) => i.sumber === "strategis").length;
-  const manualCount = items.filter((i) => i.sumber === "manual").length;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120]">
@@ -607,23 +591,6 @@ export default function IndikatorBulananPage() {
                   {BULAN_LABEL[bulan]} {tahun}
                 </span>
               </p>
-              {/* Data source summary */}
-              {!loading && items.length > 0 && (
-                <div className="flex items-center gap-2 mt-1.5">
-                  {autoCount > 0 && (
-                    <span className="inline-flex items-center gap-1 text-[10px] text-slate-400">
-                      <Zap className="w-3 h-3 text-blue-400" />
-                      {autoCount} dari Indikator Strategis
-                    </span>
-                  )}
-                  {autoCount > 0 && manualCount > 0 && (
-                    <span className="text-slate-200 dark:text-slate-700 text-[10px]">•</span>
-                  )}
-                  {manualCount > 0 && (
-                    <span className="text-[10px] text-slate-400">{manualCount} tambahan manual</span>
-                  )}
-                </div>
-              )}
             </div>
 
             {/* Period navigation */}
@@ -716,29 +683,7 @@ export default function IndikatorBulananPage() {
               Coba pilih periode lain di atas.
             </p>
           </div>
-        ) : manualCount > 0 && autoCount > 0 ? (
-          /* Both manual and strategis — show in separate sections */
-          <>
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-              Tambahan Manual
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
-              {items.filter((i) => i.sumber === "manual").map((item) => (
-                <StatCard key={item.id} item={item} />
-              ))}
-            </div>
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Zap className="w-3 h-3 text-blue-400" />
-              Dari Indikator Strategis {tahun}
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {items.filter((i) => i.sumber === "strategis").map((item) => (
-                <StatCard key={item.id} item={item} />
-              ))}
-            </div>
-          </>
         ) : (
-          /* Only one source — show flat grid */
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {items.map((item) => (
               <StatCard key={item.id} item={item} />
